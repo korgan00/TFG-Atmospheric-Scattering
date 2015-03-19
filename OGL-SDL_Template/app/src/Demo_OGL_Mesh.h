@@ -33,15 +33,6 @@ private:
 
 
 	float aspect;
-	static const GLfloat cube_positions[];
-	static const GLfloat cube_colors[];
-	static const GLushort cube_indices[];
-	static const GLfloat cube_position1[];
-	static const GLfloat cube_position2[];
-	static const vmath::vec3 X;
-	static const vmath::vec3 Y;
-	static const vmath::vec3 Z;
-
 	vector<Mesh> scene;
 	CameraFPS camera;
 	GLfloat lastFrameTime;
@@ -72,7 +63,7 @@ public:
 	/***************************************************/
 	/***************************************************/
 	/***************************************************/
-
+	void forEach(std::vector<Mesh> &bunch, void(Mesh::*f)());
 	void SetupOpenGL();
 	void InitData();
 };

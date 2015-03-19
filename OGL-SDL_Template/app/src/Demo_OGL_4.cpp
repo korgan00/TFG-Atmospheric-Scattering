@@ -44,7 +44,7 @@ const vmath::vec3 Demo_OGL_4::Y(0.0f, 1.0f, 0.0f);
 const vmath::vec3 Demo_OGL_4::Z(0.0f, 0.0f, 1.0f);
 
 Demo_OGL_4::Demo_OGL_4() : running(false), window(NULL), ctxt(NULL), info(),
-			aspect(0), render_prog(0), camera(), 
+			aspect(0), render_prog(0), camera(NULL), 
             render_model_matrix_loc(0), render_projection_matrix_loc(0),
 			lastFrameTime((GLfloat)GetTickCount()),
 			projection_matrix(vmath::frustum(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, 500.0f)) {

@@ -15,7 +15,7 @@
 #include "Demo_OGL_Mesh.h"
 
 const char* Demo_OGL_Mesh::WIN_TITLE = "Titulo de la Ventana";
-const GLfloat Demo_OGL_Mesh::cube_positions[] = {
+/*const GLfloat Demo_OGL_Mesh::cube_positions[] = {
 	-1.0f, -1.0f, -1.0f, 1.0f,
 	-1.0f, -1.0f, 1.0f, 1.0f,
 	-1.0f, 1.0f, -1.0f, 1.0f,
@@ -41,14 +41,14 @@ const GLfloat Demo_OGL_Mesh::cube_position2[] = { 2.0f, 0.0f, 5.0f };
 const GLushort Demo_OGL_Mesh::cube_indices[] = {
 	0, 1, 2, 3, 6, 7, 4, 5, // First strip
 	0xFFFF, // <<-- This is the restart index
-	2, 6, 0, 4, 1, 5, 3, 7 // Second strip*/
+	2, 6, 0, 4, 1, 5, 3, 7 // Second strip
 };
 
 const vmath::vec3 Demo_OGL_Mesh::X(1.0f, 0.0f, 0.0f);
 const vmath::vec3 Demo_OGL_Mesh::Y(0.0f, 1.0f, 0.0f);
 const vmath::vec3 Demo_OGL_Mesh::Z(0.0f, 0.0f, 1.0f);
-
-Demo_OGL_Mesh::Demo_OGL_Mesh() : running(false), window(NULL), ctxt(NULL), info(), aspect(0), camera() {}
+*/
+Demo_OGL_Mesh::Demo_OGL_Mesh() : running(false), window(NULL), ctxt(NULL), info(), aspect(0), camera(NULL) {}
 
 void Demo_OGL_Mesh::OnEvent(SDL_Event* event) {
 	camera.Event(event);
@@ -58,6 +58,12 @@ void Demo_OGL_Mesh::OnEvent(SDL_Event* event) {
 		case SDLK_v:
 			std::cout << std::endl;
 			std::cout << info.client_info() << std::endl;
+			break;
+		case SDLK_o:
+			camera.mouseIsCaptured(!camera.mouseIsCaptured());
+			break;
+		case SDLK_p:
+			std::cout << " - Current position: " << camera.position()[0] << ", " << camera.position()[1] << ", " << camera.position()[2] << std::endl;
 			break;
 		case SDLK_ESCAPE:
 			running = false;
@@ -82,6 +88,9 @@ void Demo_OGL_Mesh::OnLoop() {
 
 void Demo_OGL_Mesh::OnCleanup() {
 	glUseProgram(0);
+
+	forEach(scene, &Mesh::cleanup);
+
 	SDL_GL_DeleteContext(ctxt);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -147,17 +156,14 @@ int Demo_OGL_Mesh::OnExecute() {
 
 void Demo_OGL_Mesh::InitData(){
 
+	camera = CameraFPS(window);
+
 	aspect = float(WIN_HEIGHT) / float(WIN_WIDTH);
 
-	scene = ObjLoader::load("Arid.obj");
+	scene = ObjLoader::loadMountains("Arid.obj");
 
-	for (std::vector<Mesh>::iterator mesh = scene.begin(); mesh != scene.end(); ++mesh)
-		mesh->initOGLData();
-	//scene.front().initOGLData();
 
-	//scene = ObjLoader("", aspect);
-	//scene.load();
-	//scene.initOGLData();
+	forEach(scene, &Mesh::initOGLData);
 
 	//Seleccionamos el color de fondo
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -180,24 +186,31 @@ void Demo_OGL_Mesh::OnRender() {
 	float t = float(GetTickCount() & 0x1FFF) / float(0x1FFF);
 
 	// Calculamos la matriz modelo
-	vmath::mat4 model_matrix(vmath::translate(0.0f, 0.0f, 0.0f)/*
+	//vmath::mat4 model_matrix(vmath::translate(0.0f, 0.0f, 0.0f)
+	/*
 									vmath::rotate(t * 360.0f, Y) *
-									vmath::rotate(t * 720.0f, Z)*/);
+									vmath::rotate(t * 720.0f, Z)*/
+	//);
 	// Calculamos la matriz de proyección mediante un frustum
-	vmath::mat4 projection_matrix(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 2000.0f) * camera.matrix());
+	//vmath::mat4 projection_matrix(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 2000.0f) * camera.matrix());
 
 	// Limpiamos el buffer de profundidad (se pone al valor por defecto)
 	// y el de color (se pone al valor de glClearColor
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (std::vector<Mesh>::iterator mesh = scene.begin(); mesh != scene.end(); ++mesh)
-		mesh->draw(model_matrix, projection_matrix);
-	
+	for (std::vector<Mesh>::iterator mesh = scene.begin(); mesh != scene.end(); ++mesh) {
+		mesh->draw(camera.matrix());
+	}
+	//SDL_SetWindowGrab(window, !SDL_GetWindowGrab(window));
 	// Buffer swap
 	SDL_GL_SwapWindow(window);
 }
 
-
+void Demo_OGL_Mesh::forEach(std::vector<Mesh> &bunch, void(Mesh::*f)()) {
+	for (std::vector<Mesh>::iterator mesh = bunch.begin(); mesh != bunch.end(); ++mesh) {
+		(*mesh.*f)();
+	}
+}
 
 
 

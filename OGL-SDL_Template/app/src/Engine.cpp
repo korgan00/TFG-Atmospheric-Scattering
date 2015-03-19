@@ -3,21 +3,23 @@
 
 const char* Engine::WIN_TITLE = "Titulo de la Ventana";
 
-Engine::Engine() : running(false), window(NULL), ctxt(NULL), info() {}
+Engine::Engine() : _running(false), _window(NULL), _ctxt(NULL), _info(), 
+					_old_t((GLfloat)GetTickCount()), _t(0.0f), _dt(0.0f), 
+					_camera(NULL), _scene() {}
 
 int Engine::OnExecute() {
 	if (!Init()) return -1;
 
 	SDL_Event event;
 
-	while (running) {
+	while (_running) {
 		while (SDL_PollEvent(&event))
 			Event(&event);
 
 		Loop();
 		Render();
 
-		info.frame(window, WIN_TITLE);
+		_info.frame(_window, WIN_TITLE);
 	}
 
 	Cleanup();
@@ -25,28 +27,34 @@ int Engine::OnExecute() {
 }
 
 bool Engine::OnInit() {
+	cout << "Initializing SDL" << endl;
 	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) return false;
 
-	window = SDL_CreateWindow(WIN_TITLE,
+	cout << "Initializing IMG Library" << endl;
+	if (IMG_Init(IMG_INIT_JPG) != IMG_INIT_JPG) return false;
+
+	cout << "Creating a window" << endl;
+	_window = SDL_CreateWindow(WIN_TITLE,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 			WIN_WIDTH, WIN_HEIGHT,
 			SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
 
-	if (!window) return false;
+	if (!_window) return false;
 
+	cout << "Setting up OGL" << endl;
 	SetupOpenGL();
+	cout << "Initializing OpenGL data" << endl;
 	InitData();
 
-	running = true;
+	_running = true;
 
 	return true;
 }
 void Engine::SetupOpenGL() {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
-	ctxt = SDL_GL_CreateContext(window);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	_ctxt = SDL_GL_CreateContext(_window);
 
-	//vsync ON
 	SDL_GL_SetSwapInterval(1);
 
 	if (gl3wInit()) {
@@ -59,111 +67,67 @@ void Engine::SetupOpenGL() {
 }
 
 void Engine::InitData() {
-	/* Genera un numero de espacios para guardar vertices, pero no
-	* son objetos de vertices, simplemente son nombres ("punteros")
-	* a donde hay que guardarlo, numVaos es 1 y VAOs es un array de ints
-	* De manera informal, busca un sitio para colocar el array y te dice donde
-	* */
-	glGenVertexArrays(1, vao);
-	/* Inicializamos la zona de memoria del vertexArray del nombre("puntero")
-	* que le pasamos. Ademas vuelve activo el vertexArray,
-	* Si ya estaba inicializada solo lo vuelve activo.
-	* */
-	glBindVertexArray(vao[0]);
+	_camera = CameraFPS(_window);
 
-	struct VertexData {
-		GLfloat color[3];
-		GLfloat position[4];
-	};
+	_scene = ObjLoader::loadMountains("Arid.obj");
 
-	VertexData vertices[NumVertices] = {
-		{ { 1.00f, 0.00f, 0.00f }, { 0.00f, 0.90f } },
-		{ { 0.00f, 1.00f, 0.00f }, { 0.90f, -0.90f } },
-		{ { 0.00f, 0.00f, 1.00f }, { -0.90f, -0.90f } }
+	forEach(_scene, &Mesh::initOGLData);
 
-	};
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
-	/* Genera un numero de espacios para guardar Buffers pero no son buffers
-	* Simplemente tienen espacio para ser guardados.
-	* NumBuffers es 1 y buffers es un array de ints.
-	* GLuint  Buffers[NumBuffers];
-	* */
-	glGenBuffers(1, buffer);
-	/* Se crea el objeto buffer y se une al nombre que le hemos dado.
-	* ArrayBuffer es 0 a si que es el primero de los nombres (hemos pedido 1 xD)
-	* Si ya esta creado no lo crea.
-	* En ambos casos lo vuelve asocia a GL_ARRAY_BUFFER
-	* */
-	glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
-	/* Coge el Buffer object asociado a GL_ARRAY_BUFFER, ademas elije la
-	* mejor manera de guardarlo y lo rellena con la
-	* informacion de vertices, hay que indicarle el tamaño en bytes.
-	* GL_STATIC_DRAW le indica como se va a usar el buffer.
-	*
-	* Static se va a modificar una vez y a usar muchas.
-	* Dynamic se va a modificar muchas veces y se va a usar muchas veces
-	* Stream se va a modificar una vez y se va a usar pocas veces
-	*
-	* Draw se modifica por la aplicacion y lo usa opengl
-	* Read se modifica por opengl y lo lee la aplicacion
-	* Copy se modifica por opengl y lo lee opengl     *
-	* */
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
-		vertices, GL_STATIC_DRAW);
-
-	ShaderInfo shaders[] = {
-		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.vert" },
-		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
-		{ GL_NONE, NULL }
-	};
-
-	GLuint program = LoadShaders(shaders);
-	glUseProgram(program);
-
-	glVertexAttribPointer(vColor, 3, GL_FLOAT,
-		GL_TRUE, sizeof(VertexData), NULL);
-	glVertexAttribPointer(vPosition, 2, GL_FLOAT,
-		GL_FALSE, sizeof(VertexData),
-		(const GLvoid*)sizeof(vertices[0].color));
-
-	glEnableVertexAttribArray(vColor);
-	glEnableVertexAttribArray(vPosition);
+	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 }
 
 
 
 void Engine::OnEvent(SDL_Event* event) {
+	_camera.Event(event);
 	switch (event->type) {
 		case SDL_KEYUP:
 			switch (event->key.keysym.sym){
 			case SDLK_v:
 				std::cout << glGetString(GL_VERSION) << std::endl;
 				break;
+			case SDLK_o:
+				_camera.mouseIsCaptured(!_camera.mouseIsCaptured());
+				break;
+			case SDLK_p:
+				std::cout << " - Current position: " << _camera.position()[0] << ", " << _camera.position()[1] << ", " << _camera.position()[2] << std::endl;
+				break;
 			case SDLK_ESCAPE:
-				running = false;
+				_running = false;
 				break;
 			default:
 				break;
 			}
 			break;
 		case SDL_QUIT:
-			running = false;
+			_running = false;
 			break;
 		default:
 			break;
 	}
 }
 void Engine::OnLoop() {
+	_t = (GLfloat)GetTickCount();
+	_dt = _t - _old_t;
+	_old_t = _t;
+
+	_camera.tick(_t, _dt);
 
 }
 
 void Engine::OnCleanup() {
 	glUseProgram(0); //clear shader
-	glDeleteVertexArrays(1, vao); 
-	glDeleteBuffers(1, buffer);
-	SDL_GL_DeleteContext(ctxt);
-	SDL_DestroyWindow(window);
+
+	forEach(_scene, &Mesh::cleanup);
+
+	SDL_GL_DeleteContext(_ctxt);
+	SDL_DestroyWindow(_window);
 	SDL_Quit();
 }
 
@@ -171,13 +135,16 @@ void Engine::OnCleanup() {
 
 void Engine::OnRender() {
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindVertexArray(vao[0]);
-	glDrawArrays(GL_TRIANGLES, 0, NumVertices);
 
-	SDL_GL_SwapWindow(window);
+	for (std::vector<Mesh>::iterator mesh = _scene.begin(); mesh != _scene.end(); ++mesh) {
+		mesh->draw(_camera.matrix());
+	}
+
+	SDL_GL_SwapWindow(_window);
 }
+
 
 
 

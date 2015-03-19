@@ -14,8 +14,8 @@ using namespace std;
 class ObjLoader {
 public:
 
-	static vector<Mesh> load(string file);
-
+	static vector<Mesh> loadMountains(string file);
+	static Mesh* loadMountain(ifstream& input, GLuint* accVertex);
 };
 
 #endif /* OBJ_LOADER_H_ */

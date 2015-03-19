@@ -101,5 +101,7 @@
     <None Include="app\shaders\gouraud.vert" />
     <None Include="app\shaders\texture.fs.glsl" />
     <None Include="app\shaders\texture.vs.glsl" />
+    <None Include="app\shaders\scattering.fs.glsl" />
+    <None Include="app\shaders\scattering.vs.glsl" />
   </ItemGroup>
 </Project>

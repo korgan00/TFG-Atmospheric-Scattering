@@ -18,65 +18,77 @@ using namespace std;
 #include "SDL_image.h"
 
 class Mesh {
-private:
-
+public:
 	typedef vmath::uvec3 Face;
 	typedef vmath::vec3 Vertex;
 	typedef vmath::vec2 TexVertex;
 
-	Vertex *vertex;
-	int vertexCount;
-	GLuint sizeOfVertex;
+private:
 
-	TexVertex *texCoord;
-	int texCoordCount;
-	GLuint sizeOfTexCoords;
+	Vertex *_vertices;
+	GLint _vertexCount;
+	GLuint _sizeOfVertex;
 
-	Face *faces;
-	int facesCount;
-	GLuint sizeOfFaces;
+	TexVertex *_texCoord;
+	GLint _texCoordCount;
+	GLuint _sizeOfTexCoords;
 
-	std::string name;
+	Face *_faces;
+	GLint _facesCount;
+	GLuint _sizeOfFaces;
 
-	SDL_Surface* texture_A;
-	GLuint texture_A_id;
+	std::string _name;
 
-	GLuint render_prog;
-	GLuint render_model_matrix_loc;
-	GLuint render_projection_matrix_loc;
-	GLuint render_texture_loc;
+	SDL_Surface* _texture;
+	GLuint _texture_id;
 
-	GLuint ebo[1];
-	GLuint vao[1];
-	GLuint vbo[1];
+	GLuint _render_prog;
+	GLuint _render_projection_matrix_loc;
+	GLuint _render_texture_loc;
+
+	GLuint _ebo[1];
+	GLuint _vao[1];
+	GLuint _vbo[1];
 
 
-	void initializeSizes() {
-
-		vertex = new Vertex[vertexCount];
-		sizeOfVertex = vertexCount * sizeof(Vertex);
-
-		texCoord = new TexVertex[texCoordCount];
-		sizeOfTexCoords = texCoordCount * sizeof(TexVertex);
-		
-		faces = new Face[facesCount];
-		sizeOfFaces = facesCount * sizeof(Face);
-
-		cout << vertexCount << "::" << texCoordCount << "::" << facesCount << endl;
-		cout << sizeOfVertex << ", " << sizeOfTexCoords << ", " << sizeOfFaces << endl;
-	}
 
 public:
 
 	Mesh();
 
-	static Mesh* load(ifstream& input, GLuint* accumulatedVertex);
+	void initializeSizes(GLint vertCount, GLint texCount, GLint facesCount) {
+		_vertexCount = vertCount;
+		_vertices = new Vertex[_vertexCount];
+		_sizeOfVertex = _vertexCount * sizeof(Vertex);
 
-	void draw(vmath::mat4 model_matrix, vmath::mat4 projection_matrix);
+		_texCoordCount = texCount;
+		_texCoord = new TexVertex[_texCoordCount];
+		_sizeOfTexCoords = _texCoordCount * sizeof(TexVertex);
+
+		_facesCount = facesCount;
+		_faces = new Face[facesCount];
+		_sizeOfFaces = facesCount * sizeof(Face);
+
+		cout << _vertexCount << "::" << _texCoordCount << "::" << _facesCount << endl;
+		cout << _sizeOfVertex << ", " << _sizeOfTexCoords << ", " << _sizeOfFaces << endl;
+	}
+
+	void draw(vmath::mat4 projection_matrix);
 
 	void initOGLData();
+	void cleanup();
 
+	inline GLint vertexCount() { return _vertexCount; }
+	inline Vertex* vertices() { return _vertices; }
 
+	inline GLint texCoordCount() { return _texCoordCount; }
+	inline TexVertex* texCoord() { return _texCoord; }
+
+	inline GLint facesCount() { return _facesCount; }
+	inline Face* faces() { return _faces; }
+
+	inline void name(string n) { _name = n; }
+	inline string name() { return _name; }
 };
 
 

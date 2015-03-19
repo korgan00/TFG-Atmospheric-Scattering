@@ -39,6 +39,8 @@
     <None Include="app\shaders\geometry_instancingB.vs.glsl" />
     <None Include="app\shaders\gouraud.frag" />
     <None Include="app\shaders\gouraud.vert" />
+    <None Include="app\shaders\scattering.fs.glsl" />
+    <None Include="app\shaders\scattering.vs.glsl" />
     <None Include="app\shaders\simple.fs.glsl" />
     <None Include="app\shaders\texture.fs.glsl" />
     <None Include="app\shaders\texture.vs.glsl" />

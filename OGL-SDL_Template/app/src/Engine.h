@@ -1,35 +1,40 @@
 /*
 * Engine.h
 *
-*  Created on: 01/07/2013
+*  Created on: 15/03/2015
 *      Author: Korgan
 */
 
 #ifndef ENGINE_H_
 #define ENGINE_H_
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "../common/common.h"
+#include "ObjLoader.h"
+#include "CameraFPS.h"
 
 class Engine {
 private:
-	bool running;
-	SDL_Window* window;
-	SDL_GLContext ctxt;
+	bool _running;
+	SDL_Window* _window;
+	SDL_GLContext _ctxt;
 
 	static const uint32_t   WIN_HEIGHT = DEFAULT_WIN_HEIGHT;
 	static const uint32_t   WIN_WIDTH = DEFAULT_WIN_WIDTH;
 	static const char*      WIN_TITLE; //px
-	Info_Manager info;
+	Info_Manager _info;
+
+	GLfloat _old_t;
+	GLfloat _t;
+	GLfloat _dt;
 
 	/***************************************************/
 
-	enum Attrib_Locs { vPosition = 0, vColor = 1 };
+	CameraFPS _camera;
+	vector<Mesh> _scene;
 
-	GLuint  vao[1];
-	GLuint  buffer[1];
-
-	static const GLuint NumVertices = 3;
 public:
 
 	Engine();
@@ -56,6 +61,14 @@ public:
 
 	void SetupOpenGL();
 	void InitData();
+
+
+	inline void forEach(std::vector<Mesh> &bunch, void(Mesh::*f)()){
+		for (std::vector<Mesh>::iterator mesh = bunch.begin(); mesh != bunch.end(); ++mesh) {
+			(*mesh.*f)();
+		}
+	}
+
 };
 
 
