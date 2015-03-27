@@ -46,11 +46,19 @@ private:
 	GLuint _render_projection_matrix_loc;
 	GLuint _render_texture_loc;
 
+	//scattering uniforms
+	GLuint _uniform_lightDir; //VEC3
+	GLuint _uniform_cam; //VEC3
+	GLuint _uniform_density; //FLOAT[][]
+	GLuint _uniform_betaER; //VEC3
+	GLuint _uniform_betaEM; //VEC3
+	GLuint _uniform_betaSR; //VEC3
+	GLuint _uniform_betaSM; //VEC3
+	GLuint _uniform_lightSun; //FLOAT
+
 	GLuint _ebo[1];
 	GLuint _vao[1];
 	GLuint _vbo[1];
-
-
 
 public:
 
@@ -73,7 +81,7 @@ public:
 		cout << _sizeOfVertex << ", " << _sizeOfTexCoords << ", " << _sizeOfFaces << endl;
 	}
 
-	void draw(vmath::mat4 projection_matrix);
+	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 
 	void initOGLData();
 	void cleanup();
@@ -89,6 +97,7 @@ public:
 
 	inline void name(string n) { _name = n; }
 	inline string name() { return _name; }
+
 };
 
 

@@ -1,14 +1,15 @@
 
 #include "CameraFPS.h"
 
-const GLfloat CameraFPS::MOVMENT = 0.05f;
+const GLfloat CameraFPS::MOVMENT = 0.35f;
 const GLfloat CameraFPS::ROTATION = 0.15f;
 const GLfloat CameraFPS::MOUSE_ROTATION = 180.0f;
+const GLfloat CameraFPS::RENDER_DISTANCE = 9000.0f;
 
-CameraFPS::CameraFPS(SDL_Window* w) : 
-		_captureMouse(false), _wrapping(false), _window(w), _velocity(0, 0, 0), 
-		_rotating(0, 0, 0), _xRotation(0), _yRotation(0), _updateRotation(false), 
-		_currentTranslation(vmath::mat4::identity()) {
+CameraFPS::CameraFPS(SDL_Window* w) :
+		_captureMouse(false), _wrapping(false), _window(w), _velocity(0, 0, 0),
+		_rotating(0, 0, 0), _xRotation(0), _yRotation(0), _updateRotation(false),
+		_currentTranslation(vmath::mat4::identity()), _disableCamera(false) {
 
 	int winWidth, winHeight;
 	SDL_GetWindowSize(_window, &winWidth, &winHeight);
@@ -17,10 +18,18 @@ CameraFPS::CameraFPS(SDL_Window* w) :
 }
 
 void CameraFPS::Event(SDL_Event* event) {
+	if (_disableCamera) {
+		if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_t) {
+				_disableCamera = false;
+		}
+		return;
+	}
+
 	switch (event->type) {
 	case SDL_MOUSEMOTION: if (_captureMouse) { mouseMotionCaptured(event); } break;
 	case SDL_KEYDOWN:
 		switch (event->key.keysym.sym){
+		case SDLK_t:	 disabledCamera(true); break;
 		case SDLK_s:	 move(Z, NEGATIVE); break;
 		case SDLK_w:	 move(Z, POSITIVE); break;
 		case SDLK_a:	 move(X, NEGATIVE); break;
@@ -95,7 +104,7 @@ void CameraFPS::tick(GLfloat time, GLfloat elapsedTime) {
 		SDL_GetWindowSize(_window, &winWidth, &winHeight);
 		GLfloat aspect = float(DEFAULT_WIN_HEIGHT) / float(DEFAULT_WIN_WIDTH);
 
-		_currentMatrix = vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 2000.0f) * (currentRotation * _currentTranslation);
+		_currentMatrix = vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, RENDER_DISTANCE) * (currentRotation * _currentTranslation);
 	}
 
 }

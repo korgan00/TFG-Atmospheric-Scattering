@@ -80,6 +80,9 @@ LoadShaders( ShaderInfo* shaders )
         GLint compiled;
         glGetShaderiv( shader, GL_COMPILE_STATUS, &compiled );
         if ( !compiled ) {
+
+#define _DEBUG
+
 #ifdef _DEBUG
             GLsizei len;
             glGetShaderiv( shader, GL_INFO_LOG_LENGTH, &len );

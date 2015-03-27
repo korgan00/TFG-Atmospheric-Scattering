@@ -5,7 +5,7 @@ const char* Engine::WIN_TITLE = "Titulo de la Ventana";
 
 Engine::Engine() : _running(false), _window(NULL), _ctxt(NULL), _info(), 
 					_old_t((GLfloat)GetTickCount()), _t(0.0f), _dt(0.0f), 
-					_camera(NULL), _scene() {}
+					_camera(NULL), _scene(), _cube() {}
 
 int Engine::OnExecute() {
 	if (!Init()) return -1;
@@ -52,7 +52,7 @@ bool Engine::OnInit() {
 }
 void Engine::SetupOpenGL() {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	_ctxt = SDL_GL_CreateContext(_window);
 
 	SDL_GL_SetSwapInterval(1);
@@ -69,13 +69,16 @@ void Engine::SetupOpenGL() {
 void Engine::InitData() {
 	_camera = CameraFPS(_window);
 
-	_scene = ObjLoader::loadMountains("Arid.obj");
-
+	/*_scene = ObjLoader::loadMountains("AridSimple.obj");/*/
+	_scene = ObjLoader::loadMountains("Arid.obj");//*/
 	forEach(_scene, &Mesh::initOGLData);
+
+	_cube = ObjLoader::loadMountains("Cubo.obj");
+	forEach(_cube, &Mesh::initOGLData);
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-	glEnable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
@@ -125,6 +128,7 @@ void Engine::OnCleanup() {
 	glUseProgram(0); //clear shader
 
 	forEach(_scene, &Mesh::cleanup);
+	forEach(_cube, &Mesh::cleanup);
 
 	SDL_GL_DeleteContext(_ctxt);
 	SDL_DestroyWindow(_window);
@@ -139,7 +143,10 @@ void Engine::OnRender() {
 
 
 	for (std::vector<Mesh>::iterator mesh = _scene.begin(); mesh != _scene.end(); ++mesh) {
-		mesh->draw(_camera.matrix());
+		mesh->draw(_camera.matrix(), _camera.position());
+	}
+	for (std::vector<Mesh>::iterator cube = _cube.begin(); cube != _cube.end(); ++cube) {
+		cube->draw(_camera.matrix(), _camera.position());
 	}
 
 	SDL_GL_SwapWindow(_window);

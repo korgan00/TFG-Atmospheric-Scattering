@@ -8,8 +8,8 @@ void Mesh::initOGLData() {
 
 	// Seleccionamos los shaders que queremos cargar
 	ShaderInfo shaders1[] = {
-		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/texture.vs.glsl" },
-		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/texture.fs.glsl" },
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
 		{ GL_NONE, NULL }
 	};
 
@@ -18,6 +18,17 @@ void Mesh::initOGLData() {
 	_render_texture_loc = glGetUniformLocation(_render_prog, "texture_diffuse");
 	glUniform1i(_render_texture_loc, 0); //Texture unit 0 is for base images.
 	_render_projection_matrix_loc = glGetUniformLocation(_render_prog, "projection_matrix");
+
+
+	_uniform_lightDir = glGetUniformLocation(_render_prog, "lightDir");
+	_uniform_cam = glGetUniformLocation(_render_prog, "cam");
+	//_uniform_density = glGetUniformLocation(_render_prog, "density");
+	_uniform_betaER = glGetUniformLocation(_render_prog, "betaER");
+	_uniform_betaEM = glGetUniformLocation(_render_prog, "betaEM");
+	_uniform_betaSR = glGetUniformLocation(_render_prog, "betaSR");
+	_uniform_betaSM = glGetUniformLocation(_render_prog, "betaSM");
+	_uniform_lightSun = glGetUniformLocation(_render_prog, "lightSun");
+
 
 	// Pedimos un buffer para el element buffer object
 	glGenBuffers(1, _ebo);
@@ -74,7 +85,7 @@ void Mesh::cleanup() {
 	glDeleteTextures(1, &_texture_id);
 }
 
-void Mesh::draw(vmath::mat4 projection_matrix) {
+void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 
 	// Decimos que Shader usar
 	glUseProgram(_render_prog);
@@ -83,6 +94,28 @@ void Mesh::draw(vmath::mat4 projection_matrix) {
 	// Guardamos las dos matrices en el shader para que dibuje.
 	// Al ser uniform el valor, se aprovecha entre los shaders
 	glUniformMatrix4fv(_render_projection_matrix_loc, 1, GL_FALSE, projection_matrix);
+
+	vmath::vec3 lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
+	vmath::vec3 cam = vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]);
+	// usamos la unidad de openGL como "un metro"
+	// se pude escalar esto correspondientemente para que actue 
+	// como si cada unidad de OGL fueran varios metros
+	vmath::vec3 betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 10e-6f;
+	vmath::vec3 betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 10e-5f;
+
+	vmath::vec3 betaER = betaSR;
+	vmath::vec3 betaEM = betaSM * 1.1f;
+
+	glUniform3fv(_uniform_lightDir, 1, projection_matrix);
+	glUniform3fv(_uniform_cam, 1, cam);
+	//glUniform3fv(_uniform_density, 1, projection_matrix);
+	glUniform3fv(_uniform_betaER, 1, betaER);
+	glUniform3fv(_uniform_betaEM, 1, betaEM);
+	glUniform3fv(_uniform_betaSR, 1, betaSR);
+	glUniform3fv(_uniform_betaSM, 1, betaSM);
+	glUniform1f(_uniform_lightSun, 20.0f);
+
+
 	// Activamos el vertex array Object
 	glBindVertexArray(_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);

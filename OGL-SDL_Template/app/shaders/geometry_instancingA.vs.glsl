@@ -11,8 +11,7 @@ layout (location = 2) in vec4 translation;
 
 out vec4 vs_fs_color;
 
-void main(void)
-{
+void main(void) {
     mat4 trans = mat4(   1, 0, 0, 0,
                          0, 1, 0, 0,
                          0, 0, 1, 0,

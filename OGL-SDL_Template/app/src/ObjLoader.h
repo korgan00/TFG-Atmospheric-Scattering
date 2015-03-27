@@ -16,6 +16,8 @@ public:
 
 	static vector<Mesh> loadMountains(string file);
 	static Mesh* loadMountain(ifstream& input, GLuint* accVertex);
+
+	static Mesh* buildSphere(GLfloat radius, int parallels, int meridians);
 };
 
 #endif /* OBJ_LOADER_H_ */

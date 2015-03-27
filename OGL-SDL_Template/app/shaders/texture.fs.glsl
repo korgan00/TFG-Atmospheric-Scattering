@@ -6,8 +6,8 @@ uniform sampler2D texture_diffuse;
 
 layout (location = 0) out vec4 color;
 
-void main(void)
-{
+void main(void) {
+
     //color = vs_fs_color;
-	color = texture(texture_diffuse, vs_fs_color.xy);
+	color = texture(texture_diffuse, vs_fs_color.xy) * vs_fs_color.z;
 }

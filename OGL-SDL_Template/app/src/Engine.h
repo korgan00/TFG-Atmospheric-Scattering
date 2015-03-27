@@ -34,6 +34,7 @@ private:
 
 	CameraFPS _camera;
 	vector<Mesh> _scene;
+	vector<Mesh> _cube;
 
 public:
 

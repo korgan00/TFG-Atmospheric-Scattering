@@ -102,8 +102,7 @@ bool Demo_OGL_Mesh::OnInit() {
 		return false;
 
 	cout << "Initializing IMG" << endl;
-	if (IMG_Init(IMG_INIT_JPG) != IMG_INIT_JPG)
-		return false;
+	if (IMG_Init(IMG_INIT_JPG) != IMG_INIT_JPG) return false;
 
 	cout << "Creating a window" << endl;
 	window = SDL_CreateWindow(WIN_TITLE,
@@ -199,7 +198,7 @@ void Demo_OGL_Mesh::OnRender() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (std::vector<Mesh>::iterator mesh = scene.begin(); mesh != scene.end(); ++mesh) {
-		mesh->draw(camera.matrix());
+		mesh->draw(camera.matrix(), camera.position());
 	}
 	//SDL_SetWindowGrab(window, !SDL_GetWindowGrab(window));
 	// Buffer swap

@@ -116,3 +116,9 @@ Mesh* ObjLoader::loadMountain(ifstream& input, GLuint* accVertex) {
 
 	return m;
 }
+
+Mesh* ObjLoader::buildSphere(GLfloat radius, int parallels, int meridians) {
+	Mesh* m = new Mesh();
+
+	return m;
+}

@@ -17,6 +17,7 @@ private:
 	static const GLfloat MOVMENT;
 	static const GLfloat ROTATION;
 	static const GLfloat MOUSE_ROTATION;
+	static const GLfloat RENDER_DISTANCE;
 
 	vmath::vec3 _velocity;
 	vmath::vec3 _rotating;
@@ -28,6 +29,7 @@ private:
 
 	SDL_Window* _window;
 	GLboolean _captureMouse;
+	GLboolean _disableCamera;
 	GLboolean _wrapping;
 	GLboolean _updateRotation;
 
@@ -78,6 +80,9 @@ public:
 
 	void mouseIsCaptured(GLboolean state);
 	inline GLboolean mouseIsCaptured() { return _captureMouse; }
+
+	void disabledCamera(GLboolean state) { _disableCamera = state; }
+	inline GLboolean disabledCamera() { return _disableCamera; }
 };
 
 

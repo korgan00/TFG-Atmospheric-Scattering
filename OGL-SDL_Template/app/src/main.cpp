@@ -7,7 +7,9 @@
 #include "ObjLoader.h"
 #include <vector>
 
+
 int main(int argc, char* argv[]) {
+	//std::cin.get();
 	Engine* d = new Engine();
 	d->Execute();
 	//vector<Mesh> vec = ObjLoader::load("Arid.obj");
