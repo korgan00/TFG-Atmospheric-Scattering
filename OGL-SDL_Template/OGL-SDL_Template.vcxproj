@@ -20,6 +20,7 @@
     <ClCompile Include="app\src\main.cpp" />
     <ClCompile Include="app\src\Mesh.cpp" />
     <ClCompile Include="app\src\ObjLoader.cpp" />
+    <ClCompile Include="app\src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\common.h" />
@@ -32,6 +33,7 @@
     <ClInclude Include="app\src\Engine.h" />
     <ClInclude Include="app\src\Mesh.h" />
     <ClInclude Include="app\src\ObjLoader.h" />
+    <ClInclude Include="app\src\Shader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app\shaders\fog.fs.glsl" />

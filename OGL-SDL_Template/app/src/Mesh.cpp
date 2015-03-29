@@ -13,21 +13,21 @@ void Mesh::initOGLData() {
 		{ GL_NONE, NULL }
 	};
 
-	_render_prog = LoadShaders(shaders1);
-	glUseProgram(_render_prog);
-	_render_texture_loc = glGetUniformLocation(_render_prog, "texture_diffuse");
+	_shader.load(shaders1);
+	_shader.use();
+	_render_texture_loc = glGetUniformLocation(_shader.id(), "texture_diffuse");
 	glUniform1i(_render_texture_loc, 0); //Texture unit 0 is for base images.
-	_render_projection_matrix_loc = glGetUniformLocation(_render_prog, "projection_matrix");
+	_render_projection_matrix_loc = glGetUniformLocation(_shader.id(), "projection_matrix");
 
 
-	_uniform_lightDir = glGetUniformLocation(_render_prog, "lightDir");
-	_uniform_cam = glGetUniformLocation(_render_prog, "cam");
+	_uniform_lightDir = glGetUniformLocation(_shader.id(), "lightDir");
+	_uniform_cam = glGetUniformLocation(_shader.id(), "cam");
 	//_uniform_density = glGetUniformLocation(_render_prog, "density");
-	_uniform_betaER = glGetUniformLocation(_render_prog, "betaER");
-	_uniform_betaEM = glGetUniformLocation(_render_prog, "betaEM");
-	_uniform_betaSR = glGetUniformLocation(_render_prog, "betaSR");
-	_uniform_betaSM = glGetUniformLocation(_render_prog, "betaSM");
-	_uniform_lightSun = glGetUniformLocation(_render_prog, "lightSun");
+	_uniform_betaER = glGetUniformLocation(_shader.id(), "betaER");
+	_uniform_betaEM = glGetUniformLocation(_shader.id(), "betaEM");
+	_uniform_betaSR = glGetUniformLocation(_shader.id(), "betaSR");
+	_uniform_betaSM = glGetUniformLocation(_shader.id(), "betaSM");
+	_uniform_lightSun = glGetUniformLocation(_shader.id(), "lightSun");
 
 
 	// Pedimos un buffer para el element buffer object
@@ -88,7 +88,8 @@ void Mesh::cleanup() {
 void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 
 	// Decimos que Shader usar
-	glUseProgram(_render_prog);
+	//glUseProgram(_render_prog);
+	_shader.use();
 
 	// Posicion en el shader, cantidad de matrices, es traspuesta? , matriz a setear.
 	// Guardamos las dos matrices en el shader para que dibuje.

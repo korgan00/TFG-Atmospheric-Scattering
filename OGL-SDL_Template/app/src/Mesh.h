@@ -16,6 +16,7 @@
 using namespace std;
 #include "../common/common.h"
 #include "SDL_image.h"
+#include "Shader.h"
 
 class Mesh {
 public:
@@ -42,7 +43,7 @@ private:
 	SDL_Surface* _texture;
 	GLuint _texture_id;
 
-	GLuint _render_prog;
+	Shader _shader;
 	GLuint _render_projection_matrix_loc;
 	GLuint _render_texture_loc;
 
