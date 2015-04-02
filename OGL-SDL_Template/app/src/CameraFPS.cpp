@@ -8,7 +8,7 @@ const GLfloat CameraFPS::RENDER_DISTANCE = 9000.0f;
 
 CameraFPS::CameraFPS(SDL_Window* w) :
 		_captureMouse(false), _wrapping(false), _window(w), _velocity(0, 0, 0),
-		_rotating(0, 0, 0), _xRotation(0), _yRotation(0), _updateRotation(false),
+		_rotating(0, 0, 0), _xRotation(0), _yRotation(0), _updateRotation(true),
 		_currentTranslation(vmath::mat4::identity()), _disableCamera(false) {
 
 	int winWidth, winHeight;

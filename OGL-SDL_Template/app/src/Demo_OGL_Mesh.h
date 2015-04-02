@@ -12,7 +12,8 @@
 #include <sstream>
 
 #include "../common/common.h"
-#include "ObjLoader.h"
+#include "mesh/ObjLoader.h"
+#include "mesh/Mesh.h"
 #include "CameraFPS.h"
 
 

@@ -5,7 +5,7 @@ const char* Engine::WIN_TITLE = "Titulo de la Ventana";
 
 Engine::Engine() : _running(false), _window(NULL), _ctxt(NULL), _info(), 
 					_old_t((GLfloat)GetTickCount()), _t(0.0f), _dt(0.0f), 
-					_camera(NULL), _scene(), _cube() {}
+					_camera(NULL), _scene() {}
 
 int Engine::OnExecute() {
 	if (!Init()) return -1;
@@ -70,11 +70,12 @@ void Engine::InitData() {
 	_camera = CameraFPS(_window);
 
 	/*_scene = ObjLoader::loadMountains("AridSimple.obj");/*/
-	_scene = ObjLoader::loadMountains("Arid.obj");//*/
-	forEach(_scene, &Mesh::initOGLData);
+	//vector<Mesh> mountains = ObjLoader::loadObjects("Arid.obj");//*/
+	//vector<Mesh> cubes = ObjLoader::loadObjects("Cubo.obj");
+	//_scene.sceneObjects(mountains);
+	//_scene.addObjects(cubes);
 
-	_cube = ObjLoader::loadMountains("Cubo.obj");
-	forEach(_cube, &Mesh::initOGLData);
+	_scene.initOGLData();
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -83,6 +84,14 @@ void Engine::InitData() {
 	glDepthFunc(GL_LESS);
 
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
+}
+
+void Engine::InitMountainTextures(vector<Mesh> mountains) {
+	for (std::vector<Mesh>::iterator mesh = mountains.begin(); mesh != mountains.end(); ++mesh) {
+		//stringstream ss;
+		//ss << "../OGL-SDL_Template/app/resources/ObjTex/QuantumArid_Diffuse_" << mesh->name()[10] << ".jpg";
+		//mesh->diffuseTexture(IMG_Load(ss.str().c_str()));
+	}
 }
 
 
@@ -127,8 +136,9 @@ void Engine::OnLoop() {
 void Engine::OnCleanup() {
 	glUseProgram(0); //clear shader
 
-	forEach(_scene, &Mesh::cleanup);
-	forEach(_cube, &Mesh::cleanup);
+	_scene.cleanup();
+	//forEach(_scene, &Mesh::cleanup);
+	//forEach(_cube, &Mesh::cleanup);
 
 	SDL_GL_DeleteContext(_ctxt);
 	SDL_DestroyWindow(_window);
@@ -141,13 +151,7 @@ void Engine::OnRender() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-	for (std::vector<Mesh>::iterator mesh = _scene.begin(); mesh != _scene.end(); ++mesh) {
-		mesh->draw(_camera.matrix(), _camera.position());
-	}
-	for (std::vector<Mesh>::iterator cube = _cube.begin(); cube != _cube.end(); ++cube) {
-		cube->draw(_camera.matrix(), _camera.position());
-	}
+	_scene.draw(_camera.matrix(), _camera.position());
 
 	SDL_GL_SwapWindow(_window);
 }

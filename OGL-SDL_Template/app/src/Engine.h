@@ -12,8 +12,9 @@
 #include <sstream>
 
 #include "../common/common.h"
-#include "ObjLoader.h"
+#include "mesh/ObjLoader.h"
 #include "CameraFPS.h"
+#include "Scene.h"
 
 class Engine {
 private:
@@ -33,8 +34,9 @@ private:
 	/***************************************************/
 
 	CameraFPS _camera;
-	vector<Mesh> _scene;
-	vector<Mesh> _cube;
+	Scene _scene;
+	//vector<Mesh> _scene;
+	//vector<Mesh> _cube;
 
 public:
 
@@ -62,13 +64,7 @@ public:
 
 	void SetupOpenGL();
 	void InitData();
-
-
-	inline void forEach(std::vector<Mesh> &bunch, void(Mesh::*f)()){
-		for (std::vector<Mesh>::iterator mesh = bunch.begin(); mesh != bunch.end(); ++mesh) {
-			(*mesh.*f)();
-		}
-	}
+	void Engine::InitMountainTextures(vector<Mesh> mountains);
 
 };
 

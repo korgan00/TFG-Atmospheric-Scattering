@@ -13,26 +13,28 @@
   <ItemGroup>
     <ClCompile Include="app\common\gl3w.c" />
     <ClCompile Include="app\common\LoadShaders.cpp" />
+    <ClCompile Include="app\common\Logger.cpp" />
     <ClCompile Include="app\src\CameraFPS.cpp" />
     <ClCompile Include="app\src\Demo_OGL_4.cpp" />
     <ClCompile Include="app\src\Demo_OGL_Mesh.cpp" />
     <ClCompile Include="app\src\Engine.cpp" />
     <ClCompile Include="app\src\main.cpp" />
-    <ClCompile Include="app\src\Mesh.cpp" />
-    <ClCompile Include="app\src\ObjLoader.cpp" />
-    <ClCompile Include="app\src\Shader.cpp" />
+    <ClCompile Include="app\src\mesh\Mesh.cpp" />
+    <ClCompile Include="app\src\mesh\ObjLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\common.h" />
     <ClInclude Include="app\common\infoManager.h" />
     <ClInclude Include="app\common\LoadShaders.h" />
+    <ClInclude Include="app\common\Logger.h" />
     <ClInclude Include="app\common\vmath.h" />
     <ClInclude Include="app\src\CameraFPS.h" />
     <ClInclude Include="app\src\Demo_OGL_4.h" />
     <ClInclude Include="app\src\Demo_OGL_Mesh.h" />
     <ClInclude Include="app\src\Engine.h" />
-    <ClInclude Include="app\src\Mesh.h" />
-    <ClInclude Include="app\src\ObjLoader.h" />
+    <ClInclude Include="app\src\mesh\Mesh.h" />
+    <ClInclude Include="app\src\mesh\ObjLoader.h" />
+    <ClInclude Include="app\src\Scene.h" />
     <ClInclude Include="app\src\Shader.h" />
   </ItemGroup>
   <ItemGroup>
@@ -91,6 +93,8 @@
       <AdditionalDependencies>glew32s.lib;opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <DelayLoadDLLs>
+      </DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

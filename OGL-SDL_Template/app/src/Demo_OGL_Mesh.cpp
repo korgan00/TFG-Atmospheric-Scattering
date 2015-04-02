@@ -89,7 +89,7 @@ void Demo_OGL_Mesh::OnLoop() {
 void Demo_OGL_Mesh::OnCleanup() {
 	glUseProgram(0);
 
-	forEach(scene, &Mesh::cleanup);
+	//forEach(scene, &Mesh::cleanup);
 
 	SDL_GL_DeleteContext(ctxt);
 	SDL_DestroyWindow(window);
@@ -159,10 +159,10 @@ void Demo_OGL_Mesh::InitData(){
 
 	aspect = float(WIN_HEIGHT) / float(WIN_WIDTH);
 
-	scene = ObjLoader::loadMountains("Arid.obj");
+	//scene = ObjLoader::loadObjects("Arid.obj");
 
 
-	forEach(scene, &Mesh::initOGLData);
+	//forEach(scene, &Mesh::initOGLData);
 
 	//Seleccionamos el color de fondo
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -198,7 +198,7 @@ void Demo_OGL_Mesh::OnRender() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (std::vector<Mesh>::iterator mesh = scene.begin(); mesh != scene.end(); ++mesh) {
-		mesh->draw(camera.matrix(), camera.position());
+		//mesh->draw(camera.matrix(), camera.position());
 	}
 	//SDL_SetWindowGrab(window, !SDL_GetWindowGrab(window));
 	// Buffer swap
