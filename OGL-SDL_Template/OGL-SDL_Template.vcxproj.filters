@@ -54,6 +54,9 @@
     <ClCompile Include="app\src\mesh\ObjLoader.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
+    <ClCompile Include="app\src\mesh\ObjToMesh.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\src\Demo_OGL_4.h">
@@ -93,6 +96,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="app\src\mesh\ObjLoader.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="app\src\mesh\ObjToMesh.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

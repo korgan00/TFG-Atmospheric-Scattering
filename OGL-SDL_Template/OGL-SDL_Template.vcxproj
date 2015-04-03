@@ -21,6 +21,7 @@
     <ClCompile Include="app\src\main.cpp" />
     <ClCompile Include="app\src\mesh\Mesh.cpp" />
     <ClCompile Include="app\src\mesh\ObjLoader.cpp" />
+    <ClCompile Include="app\src\mesh\ObjToMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\common.h" />
@@ -34,6 +35,7 @@
     <ClInclude Include="app\src\Engine.h" />
     <ClInclude Include="app\src\mesh\Mesh.h" />
     <ClInclude Include="app\src\mesh\ObjLoader.h" />
+    <ClInclude Include="app\src\mesh\ObjToMesh.h" />
     <ClInclude Include="app\src\Scene.h" />
     <ClInclude Include="app\src\Shader.h" />
   </ItemGroup>

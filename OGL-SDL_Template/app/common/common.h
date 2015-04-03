@@ -13,4 +13,40 @@
 #include <SDL.h>
 
 const std::string SHADERS_DIR = "../OGL-SDL_Template/app/shaders/";
+
+typedef vmath::vec3 Vertex;
+typedef struct {
+	Vertex *vertices;
+	GLuint count;
+} Vertices;
+
+typedef vmath::vec3 Normal;
+typedef struct {
+	Normal *normals;
+	GLuint count;
+} Normals;
+
+typedef vmath::vec2 TexVertex;
+typedef struct {
+	TexVertex *texVertices;
+	GLuint count;
+} TexVertices;
+
+typedef struct {
+	std::string name;
+	GLfloat alpha;
+	vmath::vec3 diffuse;
+	vmath::vec3 ambient;
+	vmath::vec3 specular;
+	GLfloat specularExponent;
+	GLfloat opticalDensity;
+
+	GLint illumination;
+	string textureDiffuse;
+} Material;
+typedef struct {
+	Material *materials;
+	GLuint count;
+} Materials;
+
 #endif

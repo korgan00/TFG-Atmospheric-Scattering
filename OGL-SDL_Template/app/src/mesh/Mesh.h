@@ -20,6 +20,20 @@ using namespace std;
 
 class Mesh {
 public:
+	typedef struct {
+		Vertex *v;
+		Normal *vn;
+		TexVertex *vt;
+	} PerVertex;
+
+	typedef struct {
+		Material *mat;
+		GLuint *indices;
+		GLuint indicesCount;
+	} PerDraw;
+
+
+
 	/*typedef vmath::uvec3 Face;
 	typedef vmath::vec2 TexVertex;
 
@@ -57,9 +71,13 @@ public:
 		texcoord(float a, float b);
 	};
 
-
+	*/
 private:
-
+	PerVertex *_vertexBufferObjectData;
+	GLuint _vboDataCount;
+	PerDraw *_elementBufferObjectData;
+	GLuint _eboDataCount;
+	/*
 	//std::vector<unsigned int> texture;//the id for all the textures (so we can delete the textures after use it)
 	//std::vector<unsigned int> lists;        //the id for all lists (so we can delete the lists after use it)
 	//std::vector<material*> materials;       //all materials
@@ -87,7 +105,10 @@ private:
 	*/
 public:
 
-	Mesh();
+	Mesh(PerVertex* verticesInfo, GLuint verticesCount, PerDraw* drawInfo, GLuint drawCount) :
+		_vertexBufferObjectData(verticesInfo), _vboDataCount(verticesCount), 
+		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount) {}
+
 	/*
 	void initializeSizes(GLint vertCount, GLint texCount, GLint facesCount) {
 		_vertexCount = vertCount;

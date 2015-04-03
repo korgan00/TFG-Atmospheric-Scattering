@@ -16,10 +16,10 @@ ObjLoader::ObjFileInfo* ObjLoader::load(string file) {
 	}
 
 	vector<NamedObject*> namedObjects;
-	Vertices v = { nullptr, 0, 0 };
-	Normals vn = { nullptr, 0, 0 };
-	TexVertices vt = { nullptr, 0, 0 };
-	Materials mtllib = { nullptr, 0, 0 };
+	Vertices v = { nullptr, 0 };
+	Normals vn = { nullptr, 0 };
+	TexVertices vt = { nullptr, 0 };
+	Materials mtllib = { nullptr, 0 };
 
 	count(input, namedObjects, &(v.count), &(vn.count), &(vt.count), &(mtllib.count));
 
@@ -131,11 +131,6 @@ void ObjLoader::countMtllib(char line[256], GLuint *matCount) {
 }
 
 void ObjLoader::initializeSizes(Vertices &v, Normals &vn, TexVertices &vt, Materials &mtllib) {
-	v.size		 = v.count  * sizeof(Vertex);
-	vn.size	 = vn.count * sizeof(Normal);
-	vt.size	 = vt.count * sizeof(TexVertex);
-	mtllib.size = mtllib.count * sizeof(Material);
-
 	v.vertices		 = v.count > 0 ?	  new Vertex[v.count]		 : nullptr;
 	vn.normals		 = vn.count > 0 ?	  new Normal[vn.count]		 : nullptr;
 	vt.texVertices	 = vt.count > 0 ?	  new TexVertex[vt.count]    : nullptr;
@@ -150,7 +145,6 @@ void ObjLoader::initializeSizes(Vertices &v, Normals &vn, TexVertices &vt, Mater
 void ObjLoader::initializeNamedObjects(vector<NamedObject*> &namedObjs) {
 	for (std::vector<NamedObject*>::iterator o = namedObjs.begin(); o != namedObjs.end(); ++o) {
 		Faces3v* f = &(*o)->faces;
-		f->size = f->count * sizeof(Face3v);
 		f->faces = f->count > 0 ? new Face3v[f->count] : nullptr;
 		f->count = 0;
 		initializeObjectGroups((*o)->groups);
@@ -160,7 +154,6 @@ void ObjLoader::initializeNamedObjects(vector<NamedObject*> &namedObjs) {
 void ObjLoader::initializeObjectGroups(vector<ObjectGroup*> &objGroups) {
 	for (std::vector<ObjectGroup*>::iterator g = objGroups.begin(); g != objGroups.end(); ++g) {
 		Faces3v* f = &(*g)->faces;
-		f->size = f->count * sizeof(Face3v);
 		f->faces = new Face3v[f->count];
 		f->count = 0;
 	}
@@ -253,26 +246,26 @@ void ObjLoader::processVertex(char buffer[256], Vertices *v, Normals *vn, TexVer
 }
 
 void ObjLoader::processFace(char buffer[256], Faces3v *f, GLint currentMaterial) {
-	GLuint v_x = 0, v_y = 0, v_z = 0;
-	GLuint vt_x = 0, vt_y = 0, vt_z = 0;
-	GLuint vn_x = 0, vn_y = 0, vn_z = 0;
+	GLint v_a = -1, v_b = -1, v_c = -1;
+	GLint vt_a = -1, vt_b = -1, vt_c = -1;
+	GLint vn_a = -1, vn_b = -1, vn_c = -1;
 	string line(buffer);
 
 	if (line.find("//") != std::string::npos) {
-		sscanf(buffer, "f %d//%d %d//%d %d//%d", &v_x, &vn_x, &v_y, &vn_y, &v_z, &vn_z);
+		sscanf(buffer, "f %d//%d %d//%d %d//%d", &v_a, &vn_a, &v_b, &vn_b, &v_c, &vn_c);
 	} else if (line.find("/") != std::string::npos) {
 		if (std::count(line.begin(), line.end(), '/') == 6) {
-			sscanf(buffer, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v_x, &vn_x, &vt_x, &v_y, &vn_y, &vt_y, &v_z, &vn_z, &vt_z);
+			sscanf(buffer, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v_a, &vn_a, &vt_a, &v_b, &vn_b, &vt_b, &v_c, &vn_c, &vt_c);
 		} else {
-			sscanf(buffer, "f %d/%d %d/%d %d/%d", &v_x, &vt_x, &v_y, &vt_y, &v_z, &vt_z);
+			sscanf(buffer, "f %d/%d %d/%d %d/%d", &v_a, &vt_a, &v_b, &vt_b, &v_c, &vt_c);
 		}
 	} else{
-		sscanf(buffer, "f %d %d %d", &v_x, &v_y, &v_z);
+		sscanf(buffer, "f %d %d %d", &v_a, &v_b, &v_c);
 	}
 
 
-	f->faces[f->count] = { { v_x, v_y, v_z }, { vt_x, vt_y, vt_z }, 
-						   { vn_x, vn_y, vn_z }, currentMaterial };
+	f->faces[f->count] = { { v_a, v_b, v_c }, { vt_a, vt_b, vt_c }, 
+						   { vn_a, vn_b, vn_c }, currentMaterial };
 	f->count++;
 }
 
@@ -281,7 +274,7 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 	stringstream ss;
 	string fileName(line);
 	fileName.erase(0, 7);
-	ifstream input("../OGL-SDL_Template/app/resources/" + fileName);
+	ifstream input(pathToObjects + fileName);
 
 	if (!input.is_open()) {
 		ss.clear();
@@ -394,7 +387,6 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 ObjLoader::NamedObject* ObjLoader::newNamedObject() {
 	NamedObject* n = new NamedObject();
 	n->faces.count = 0;
-	n->faces.size = 0;
 	n->groups.clear();
 	n->name = "";
 	return n;
@@ -403,7 +395,6 @@ ObjLoader::NamedObject* ObjLoader::newNamedObject() {
 ObjLoader::ObjectGroup* ObjLoader::newObjectGroup() {
 	ObjectGroup* g = new ObjectGroup();
 	g->faces.count = 0;
-	g->faces.size = 0;
 	g->name = "";
 	return g;
 }

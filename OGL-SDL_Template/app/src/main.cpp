@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "mesh/ObjLoader.h"
+#include "mesh/ObjToMesh.h"
 #include <time.h>
 
 //#include "Demo_OGL_4.h"
@@ -29,8 +30,8 @@ int main(int argc, char* argv[]) {
 
 	//ObjLoader loader;
 	clock_t start2 = clock(), diff2;
-	ObjLoader::ObjFileInfo* obj = ObjLoader::load("Earth.obj");
-
+	ObjLoader::ObjFileInfo* obj = ObjLoader::load("Arid.obj");
+	Mesh* m = ObjToMesh::convert(obj);
 	diff2 = clock() - start2;
 
 	int msec = diff2 * 1000 / CLOCKS_PER_SEC;
