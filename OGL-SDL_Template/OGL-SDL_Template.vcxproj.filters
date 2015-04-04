@@ -57,6 +57,9 @@
     <ClCompile Include="app\src\mesh\ObjToMesh.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
+    <ClCompile Include="app\common\common.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\src\Demo_OGL_4.h">
@@ -101,6 +104,9 @@
     <ClInclude Include="app\src\mesh\ObjToMesh.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="app\src\mesh\MountainTextureFactory.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="app\shaders\fog.fs.glsl">
@@ -121,5 +127,6 @@
     <None Include="app\shaders\texture.vs.glsl" />
     <None Include="app\shaders\scattering.fs.glsl" />
     <None Include="app\shaders\scattering.vs.glsl" />
+    <None Include="app\shaders\new.vs.glsl" />
   </ItemGroup>
 </Project>

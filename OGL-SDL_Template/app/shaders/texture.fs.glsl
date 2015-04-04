@@ -1,13 +1,12 @@
-#version 430
+#version 400 core
 
-in vec4 vs_fs_color;
+in  vec4 color;
 uniform sampler2D texture_diffuse;
-//uniform sampler2D texture2;
 
-layout (location = 0) out vec4 color;
+out vec4 fcolor;
 
 void main(void) {
 
-    //color = vs_fs_color;
-	color = texture(texture_diffuse, vs_fs_color.xy) * vs_fs_color.z;
+    //fcolor = color;
+	fcolor = texture(texture_diffuse, color.xy);// *color.z;
 }

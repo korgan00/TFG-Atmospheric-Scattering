@@ -120,7 +120,7 @@ void main(void)
 
 	//color = vs_fs_color;
 	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.xy).rgb *extintion;
-	color = vec4(1.0f - exp(-0.9f * (L0_Ext + inScattering) ), 1);
+	color = vec4(L0_Ext, 1.0f);//vec4(1.0f - exp(-0.9f * (L0_Ext + inScattering) ), 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);
 	//color = vec4(L0_Ext + inScattering, 1);
 	//color = vec4(phase_mieScattering, phase_mieScattering, phase_mieScattering, 1);

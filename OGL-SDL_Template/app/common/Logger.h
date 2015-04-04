@@ -31,7 +31,7 @@ public:
 	static void error(string msg) {
 		if (currentLogLevel <= ERR) {
 			changeColor(0x0C);
-			cerr << "\x1b[31m !! ERROR: " << msg << endl;
+			cerr << "!! ERROR: " << msg << endl;
 			restoreColor();
 		}
 	}

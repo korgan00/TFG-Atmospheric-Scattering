@@ -2,20 +2,21 @@
 #include "../common/common.h"
 #include <iostream>
 #include <vector>
-#include "mesh/ObjLoader.h"
-#include "mesh/ObjToMesh.h"
 #include <time.h>
 
 //#include "Demo_OGL_4.h"
 //#include "Demo_OGL_Mesh.h"
-//#include "Engine.h"
+#include "Engine.h"
 
 
 
 int main(int argc, char* argv[]) {
 	//std::cin.get();
-	//Engine* d = new Engine();
-	//d->Execute();
+	
+	
+	Engine* d = new Engine();
+	d->Execute();
+
 	//vector<Mesh> vec = ObjLoader::load("Arid.obj");
 	//DoTheImportThing("../OGL-SDL_Template/app/resources/Cubo.obj");
 	/*
@@ -26,6 +27,8 @@ int main(int argc, char* argv[]) {
 	Log::trace("test");
 	cout << "test" << endl;
 	*/
+
+	/*
 	cout << endl << endl;
 
 	//ObjLoader loader;
@@ -38,7 +41,8 @@ int main(int argc, char* argv[]) {
 	stringstream ss;
 	ss << "Time taken " << (msec / 1000) << " seconds " << (msec % 1000) << " milliseconds";
 	Log::info(ss.str());
-
+	*/
 	std::cin.get();
+	
 	return 0;
 }

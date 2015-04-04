@@ -3,8 +3,9 @@
 //uniform mat4 model_matrix;
 uniform mat4 projection_matrix;
 
-layout(location = 0) in vec3 position;
-layout(location = 1) in vec2 texPosition;
+layout(location = 0) in vec3 vPos;
+layout(location = 1) in vec3 vNorm;
+layout(location = 2) in vec2 vTex;
 
 out vec4 vs_fs_color;
 out vec3 obj;
@@ -17,9 +18,9 @@ void main(void) {
 	//if (i > 1) i = 1;
 	//vs_fs_color = vec4(i, 0, 0, 1);*/
 
-	vec3 pos = position * 10;
+	vec3 pos = vPos * 10;
 	//pos.y -= 5;
-	vs_fs_color = vec4(texPosition, 0, 1);
+	vs_fs_color = vec4(vTex, 0, 1);
 	gl_Position = projection_matrix * vec4(pos, 1);
 	obj = pos;
 }

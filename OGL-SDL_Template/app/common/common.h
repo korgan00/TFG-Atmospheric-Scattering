@@ -49,4 +49,7 @@ typedef struct {
 	GLuint count;
 } Materials;
 
+void CheckErr();
+
+
 #endif

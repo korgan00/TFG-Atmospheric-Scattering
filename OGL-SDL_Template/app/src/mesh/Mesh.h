@@ -21,18 +21,17 @@ using namespace std;
 class Mesh {
 public:
 	typedef struct {
-		Vertex *v;
-		Normal *vn;
-		TexVertex *vt;
+		Vertex v;
+		Normal vn;
+		TexVertex vt;
 	} PerVertex;
 
 	typedef struct {
 		Material *mat;
 		GLuint *indices;
 		GLuint indicesCount;
+		GLuint indicesSize;
 	} PerDraw;
-
-
 
 	/*typedef vmath::uvec3 Face;
 	typedef vmath::vec2 TexVertex;
@@ -75,8 +74,10 @@ public:
 private:
 	PerVertex *_vertexBufferObjectData;
 	GLuint _vboDataCount;
+	GLuint _vboDataSize;
 	PerDraw *_elementBufferObjectData;
 	GLuint _eboDataCount;
+	Shader _shader;
 	/*
 	//std::vector<unsigned int> texture;//the id for all the textures (so we can delete the textures after use it)
 	//std::vector<unsigned int> lists;        //the id for all lists (so we can delete the lists after use it)
@@ -98,16 +99,20 @@ private:
 
 	SDL_Surface* _texture;
 	GLuint _texture_id;
+	*/
 
-	GLuint _ebo[1];
+	SDL_Surface* _texture;
+	GLuint _uniformProjectionId;
+	GLuint *_ebo;
+	GLuint *_tso;
 	GLuint _vao[1];
 	GLuint _vbo[1];
-	*/
+	
 public:
 
 	Mesh(PerVertex* verticesInfo, GLuint verticesCount, PerDraw* drawInfo, GLuint drawCount) :
 		_vertexBufferObjectData(verticesInfo), _vboDataCount(verticesCount), 
-		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount) {}
+		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount), _shader() {}
 
 	/*
 	void initializeSizes(GLint vertCount, GLint texCount, GLint facesCount) {
@@ -127,10 +132,6 @@ public:
 		cout << _sizeOfVertex << ", " << _sizeOfTexCoords << ", " << _sizeOfFaces << endl;
 	}
 
-	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
-
-	void initOGLData();
-	void cleanup();
 
 	inline void diffuseTexture(SDL_Surface* tex) { _texture = tex; }
 
@@ -146,6 +147,11 @@ public:
 	inline void name(string n) { _name = n; }
 	inline string name() { return _name; }
 	*/
+
+	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
+
+	void initOGLData();
+	void cleanup();
 };
 
 

@@ -1,7 +1,7 @@
 
 #include "CameraFPS.h"
 
-const GLfloat CameraFPS::MOVMENT = 0.35f;
+const GLfloat CameraFPS::MOVMENT = 0.05f;
 const GLfloat CameraFPS::ROTATION = 0.15f;
 const GLfloat CameraFPS::MOUSE_ROTATION = 180.0f;
 const GLfloat CameraFPS::RENDER_DISTANCE = 9000.0f;

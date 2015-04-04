@@ -3,9 +3,9 @@
 
 const char* Engine::WIN_TITLE = "Titulo de la Ventana";
 
-Engine::Engine() : _running(false), _window(NULL), _ctxt(NULL), _info(), 
+Engine::Engine() : _running(false), _window(nullptr), _ctxt(nullptr), _info(),
 					_old_t((GLfloat)GetTickCount()), _t(0.0f), _dt(0.0f), 
-					_camera(NULL), _scene() {}
+					_camera(nullptr), _mesh(nullptr) {}
 
 int Engine::OnExecute() {
 	if (!Init()) return -1;
@@ -55,7 +55,7 @@ void Engine::SetupOpenGL() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	_ctxt = SDL_GL_CreateContext(_window);
 
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(0);
 
 	if (gl3wInit()) {
 		std::cout << "Error al Inicializar GL3W" << std::endl;
@@ -68,14 +68,18 @@ void Engine::SetupOpenGL() {
 
 void Engine::InitData() {
 	_camera = CameraFPS(_window);
-
+	
 	/*_scene = ObjLoader::loadMountains("AridSimple.obj");/*/
 	//vector<Mesh> mountains = ObjLoader::loadObjects("Arid.obj");//*/
 	//vector<Mesh> cubes = ObjLoader::loadObjects("Cubo.obj");
 	//_scene.sceneObjects(mountains);
 	//_scene.addObjects(cubes);
 
-	_scene.initOGLData();
+	//_scene.initOGLData();
+
+	ObjLoader::ObjFileInfo* obj = ObjLoader::load("Arid.obj");
+	_mesh = ObjToMesh::convert(obj, new MountainTextureFactory());
+	_mesh->initOGLData();
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -136,7 +140,8 @@ void Engine::OnLoop() {
 void Engine::OnCleanup() {
 	glUseProgram(0); //clear shader
 
-	_scene.cleanup();
+	_mesh->cleanup();
+	//_scene.cleanup();
 	//forEach(_scene, &Mesh::cleanup);
 	//forEach(_cube, &Mesh::cleanup);
 
@@ -151,7 +156,9 @@ void Engine::OnRender() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	_scene.draw(_camera.matrix(), _camera.position());
+
+	_mesh->draw(_camera.matrix(), _camera.position());
+	//_scene.draw(_camera.matrix(), _camera.position());
 
 	SDL_GL_SwapWindow(_window);
 }

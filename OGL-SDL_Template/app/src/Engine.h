@@ -14,7 +14,10 @@
 #include "../common/common.h"
 #include "mesh/ObjLoader.h"
 #include "CameraFPS.h"
-#include "Scene.h"
+//#include "Scene.h"
+#include "mesh/ObjLoader.h"
+#include "mesh/ObjToMesh.h"
+#include "mesh/MountainTextureFactory.h"
 
 class Engine {
 private:
@@ -34,9 +37,10 @@ private:
 	/***************************************************/
 
 	CameraFPS _camera;
-	Scene _scene;
+	//Scene _scene;
 	//vector<Mesh> _scene;
 	//vector<Mesh> _cube;
+	Mesh *_mesh;
 
 public:
 
