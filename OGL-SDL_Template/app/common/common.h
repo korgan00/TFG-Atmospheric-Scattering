@@ -49,7 +49,8 @@ typedef struct {
 	GLuint count;
 } Materials;
 
-void CheckErr();
+void CheckGLErr(int line, char* fileName);
 
+#define CheckErr() CheckGLErr(__LINE__, __FILE__)
 
 #endif

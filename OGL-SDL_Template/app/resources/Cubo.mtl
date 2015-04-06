@@ -2,10 +2,11 @@
 #
 #
 
-newmtl Cubo_Phong[20]
+newmtl Esferas_Phong
 illum 2
 Ka 1.000000 1.000000 1.000000
 Kd 1.000000 1.000000 1.000000
 Ks 0.000000 0.000000 0.000000
 Ns 1.000000
+map_Kd QuantumArid_Diffuse_K.jpg
 

@@ -244,7 +244,7 @@ void Demo_OGL_4::InitData(){
 	aspect = float(WIN_HEIGHT) / float(WIN_WIDTH); 
 	projection_matrix = vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 500.0f);
 
-    CheckErr();
+    //CheckErr();
 }
 
 void Demo_OGL_4::OnRender() {
@@ -299,13 +299,13 @@ void Demo_OGL_4::OnRender() {
 
 
 
-
+/*
 void Demo_OGL_4::CheckErr() {
     GLenum err = glGetError();
     if ( err != GL_NO_ERROR )
         std::cerr << "Error: " <<err;
 }
-
+*/
 
 
 

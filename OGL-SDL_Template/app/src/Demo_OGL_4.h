@@ -83,7 +83,7 @@ public:
     void SetupOpenGL();
     void InitData();
 
-    void CheckErr();
+    //void CheckErr();
 };
 
 

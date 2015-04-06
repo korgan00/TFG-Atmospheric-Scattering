@@ -2,6 +2,7 @@
 
 //uniform mat4 model_matrix;
 uniform mat4 projection_matrix;
+uniform mat4 model_matrix;
 
 layout(location = 0) in vec3 vPos;
 layout(location = 1) in vec3 vNorm;
@@ -21,6 +22,6 @@ void main(void) {
 	vec3 pos = vPos * 10;
 	//pos.y -= 5;
 	vs_fs_color = vec4(vTex, 0, 1);
-	gl_Position = projection_matrix * vec4(pos, 1);
+	gl_Position = projection_matrix * (model_matrix * vec4(pos, 1));
 	obj = pos;
 }

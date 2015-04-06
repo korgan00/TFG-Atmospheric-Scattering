@@ -12,7 +12,28 @@ Mesh* ObjToMesh::convert(ObjLoader::ObjFileInfo *objFile, ObjNameToTextureName* 
 }
 
 Mesh* ObjToMesh::convert(ObjLoader::ObjFileInfo *objFile) {
-	
+	/*
+	Log::info("Faces");
+	for (int i = 0; i < 40; i++) {
+		ObjLoader::Face3v f = objFile->namedObjects[1]->faces.faces[i];
+		cout << "[" << f.v[0] << ", " << f.v[1] << ", " << f.v[2] << "]";
+		cout << "[" << f.vn[0] << ", " << f.vn[1] << ", " << f.vn[2] << "]";
+		cout << "[" << f.vt[0] << ", " << f.vt[1] << ", " << f.vt[2] << "]" << endl;
+	}
+	/*
+	Log::info("NORMALES");
+	for (int i = 0; i < 40; i++) {
+		Normal v = objFile->vn.normals[i];
+		cout << "[" << v[0] << ", " << v[1] << ", " << v[2] << "]" << endl;
+	}
+	Log::info("TEX-VERTICES");
+	for (int i = 0; i < 40; i++) {
+		TexVertex v = objFile->vt.texVertices[i];
+		cout << "[" << v[0] << ", " << v[1] << "]" << endl;
+	}
+
+	*/
+
 	typedef vector<ObjLoader::NamedObject*>::iterator NamedObjIt;
 	typedef vector<ObjLoader::ObjectGroup*>::iterator ObjGroupIt;
 	vector<ObjLoader::NamedObject*> objs = objFile->namedObjects;
@@ -59,6 +80,12 @@ void ObjToMesh::processFaces(ObjLoader::Faces3v &faces, const ObjLoader::ObjFile
 			GLint &lastMaterial, vector<GLuint> &currIndexes, GLuint &currentIndex, string objName) {
 
 	for (int i = 0; i < faces.count; i++) {
+
+		if (faces.faces[i].material != lastMaterial) {
+			closeIndexBuffer(lastMaterial, objFile, currIndexes, elementBufferData, objName);
+			lastMaterial = faces.faces[i].material;
+		}
+
 		Mesh::PerVertex* perVertex[3];
 		perVertexFace(perVertex, faces.faces[i], objFile);
 
@@ -66,15 +93,9 @@ void ObjToMesh::processFaces(ObjLoader::Faces3v &faces, const ObjLoader::ObjFile
 		vertexBufferData.push_back(perVertex[1]);
 		vertexBufferData.push_back(perVertex[2]);
 
-
-		if (faces.faces[i].material == lastMaterial) {
-			currIndexes.push_back(currentIndex++);
-			currIndexes.push_back(currentIndex++);
-			currIndexes.push_back(currentIndex++);
-		} else {
-			closeIndexBuffer(lastMaterial, objFile, currIndexes, elementBufferData, objName);
-			lastMaterial = faces.faces[i].material;
-		}
+		currIndexes.push_back(currentIndex++);
+		currIndexes.push_back(currentIndex++);
+		currIndexes.push_back(currentIndex++);
 	}
 }
 

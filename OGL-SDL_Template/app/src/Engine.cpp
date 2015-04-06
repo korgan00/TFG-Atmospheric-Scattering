@@ -77,9 +77,23 @@ void Engine::InitData() {
 
 	//_scene.initOGLData();
 
+	vmath::vec3 lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
+	GLfloat lightSun = 20.0f;
+	// usamos la unidad de openGL como "un metro"
+	// se pude escalar esto correspondientemente para que actue 
+	// como si cada unidad de OGL fueran varios metros
+	vmath::vec3 betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 10e-6f;
+	vmath::vec3 betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 10e-5f;
+
+	vmath::vec3 betaER = betaSR;
+	vmath::vec3 betaEM = betaSM * 1.1f;
+
 	ObjLoader::ObjFileInfo* obj = ObjLoader::load("Arid.obj");
 	_mesh = ObjToMesh::convert(obj, new MountainTextureFactory());
+	//_mesh = ObjToMesh::convert(obj);
 	_mesh->initOGLData();
+	_mesh->scatteringVariables(lightDir, lightSun, betaER, betaEM, betaSR, betaSM);
+	_mesh->modelMatrix(vmath::translate(0.0f, -200.0f, 0.0f));
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -158,6 +172,7 @@ void Engine::OnRender() {
 
 
 	_mesh->draw(_camera.matrix(), _camera.position());
+
 	//_scene.draw(_camera.matrix(), _camera.position());
 
 	SDL_GL_SwapWindow(_window);

@@ -9,7 +9,7 @@ ObjLoader::ObjFileInfo* ObjLoader::load(string file) {
 	// OPEN FILE
 	ifstream input("../OGL-SDL_Template/app/resources/" + file);
 	if (!input.is_open()) {
-		ss.clear();
+		ss.str("");
 		ss << "Unable to open obj " + file;
 		Log::error(ss.str());
 		return nullptr;
@@ -111,7 +111,7 @@ void ObjLoader::countMtllib(char line[256], GLuint *matCount) {
 	ifstream input("../OGL-SDL_Template/app/resources/" + fileName);
 
 	if (!input.is_open()) {
-		ss.clear();
+		ss.str("");
 		ss << "Unable to open material library " + fileName;
 		Log::error(ss.str());
 		return;
@@ -255,7 +255,7 @@ void ObjLoader::processFace(char buffer[256], Faces3v *f, GLint currentMaterial)
 		sscanf(buffer, "f %d//%d %d//%d %d//%d", &v_a, &vn_a, &v_b, &vn_b, &v_c, &vn_c);
 	} else if (line.find("/") != std::string::npos) {
 		if (std::count(line.begin(), line.end(), '/') == 6) {
-			sscanf(buffer, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v_a, &vn_a, &vt_a, &v_b, &vn_b, &vt_b, &v_c, &vn_c, &vt_c);
+			sscanf(buffer, "f %d/%d/%d %d/%d/%d %d/%d/%d", &v_a, &vt_a, &vn_a, &v_b, &vt_b, &vn_b, &v_c, &vt_c, &vn_c);
 		} else {
 			sscanf(buffer, "f %d/%d %d/%d %d/%d", &v_a, &vt_a, &v_b, &vt_b, &v_c, &vt_c);
 		}
@@ -271,13 +271,13 @@ void ObjLoader::processFace(char buffer[256], Faces3v *f, GLint currentMaterial)
 
 void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 	//mtllib Earth.mtl
-	stringstream ss;
 	string fileName(line);
 	fileName.erase(0, 7);
 	ifstream input(pathToObjects + fileName);
+	stringstream ss;
 
 	if (!input.is_open()) {
-		ss.clear();
+		ss.str("");
 		ss << "Unable to open material library " + fileName;
 		Log::error(ss.str());
 		return;
@@ -297,7 +297,7 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 					currMtl->name.erase(0, 7);
 					mtllibs.count++;
 				} else {
-					ss.clear();
+					ss.str("");
 					ss << "Material library: " << line << " has an unknow parameter: " << buffer;
 					Log::warning(ss.str());
 				}
@@ -334,7 +334,7 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 				if (buffer[1] == 'r') {
 					currMtl->alpha = (GLfloat)atof(&buffer[3]);
 				} else {
-					ss.clear();
+					ss.str("");
 					ss << "Material library: " << line << " has an unknow parameter: " << buffer;
 					Log::warning(ss.str());
 				}
@@ -343,7 +343,7 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 				if (buffer[1] == 'l' && buffer[2] == 'l' &&	buffer[3] == 'u' && buffer[4] == 'm') {
 					currMtl->illumination = atoi(&buffer[6]);
 				} else {
-					ss.clear();
+					ss.str("");
 					ss << "Material library: " << line << " has an unknow parameter: " << buffer;
 					Log::warning(ss.str());
 				}
@@ -373,7 +373,7 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 						default:;
 					}
 				} else {
-					ss.clear();
+					ss.str("");
 					ss << "Material library: " << line << " has an unknow parameter: " << buffer;
 					Log::warning(ss.str());
 				}

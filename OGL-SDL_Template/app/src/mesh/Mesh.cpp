@@ -22,7 +22,7 @@ void Mesh::initOGLData() {
 	glGenBuffers(_eboDataCount, _ebo);
 	glGenTextures(_eboDataCount, _tso);
 
-	for (GLuint i = 0; i < _eboDataCount; i++) {
+	for (GLuint i = 1; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
 		_eboData->indicesSize = _eboData->indicesCount * sizeof(GLuint);
 		
@@ -31,20 +31,21 @@ void Mesh::initOGLData() {
 		// Lo rellenamos con los indices de los cubos
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, _eboData->indicesSize, _eboData->indices, GL_STATIC_DRAW);
 
-		_texture = IMG_Load(_eboData->mat->textureDiffuse.c_str());
+		if (_eboData->mat != nullptr && _eboData->mat->textureDiffuse != "") {
+			_texture = IMG_Load(("../OGL-SDL_Template/app/resources/ObjTex/" + _eboData->mat->textureDiffuse).c_str());
 
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glBindTexture(GL_TEXTURE_2D, _tso[i]);
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, _tso[i]);
 
-		int mode = GL_RGB;
-		if (_texture->format->BytesPerPixel == 4) mode = GL_RGBA;
+			int mode = _texture->format->BytesPerPixel == 4? GL_RGBA : GL_RGB;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, mode, _texture->w, _texture->h, 0, mode, GL_UNSIGNED_BYTE, _texture->pixels);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glGenerateMipmap(GL_TEXTURE_2D);
+			glTexImage2D(GL_TEXTURE_2D, 0, mode, _texture->w, _texture->h, 0, mode, GL_UNSIGNED_BYTE, _texture->pixels);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+		CheckErr();
 	}
-
 	// Pedimos un array de vertices
 	glGenVertexArrays(1, _vao);
 	// Le hacemos hueco
@@ -61,10 +62,10 @@ void Mesh::initOGLData() {
 	//glBufferSubData(GL_ARRAY_BUFFER, _sizeOfVertex, _sizeOfTexCoords, _texCoord);
 	//GLint vertexInfoAttrib = glGetAttribLocation(, "vertexInfo");
 
-	_shader.use();
+
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PerVertex), 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(PerVertex), (const GLvoid*)sizeof(Vertex));
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE, sizeof(PerVertex), (const GLvoid*)(sizeof(Vertex)+sizeof(Normal)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_TRUE,  sizeof(PerVertex), (const GLvoid*)(sizeof(Vertex)+sizeof(Normal)));
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 0, (const GLvoid*)(_sizeOfVertex));
 
 
@@ -76,8 +77,10 @@ void Mesh::initOGLData() {
 	CheckErr();
 	Log::trace("CHECKED!");
 
+	_shader.init();
+	_shader.modelMatrix(vmath::mat4::identity());
+	//_uniformProjectionId = glGetUniformLocation(_shader.id(), "projection_matrix");
 
-	_uniformProjectionId = glGetUniformLocation(_shader.id(), "projection_matrix");
 	//_texture_id = 0;
 
 	// You should probably use CSurface::OnLoad ... ;)
@@ -103,7 +106,17 @@ void Mesh::cleanup() {
 	/*glDeleteVertexArrays(1, _vao);
 	glDeleteBuffers(1, _ebo);
 	glDeleteBuffers(1, _vbo);
-	glDeleteTextures(1, &_texture_id);*/
+	glDeleteTextures(1, &_tso);*/
+}
+
+void Mesh::modelMatrix(vmath::mat4 modelMatrix) {
+	_shader.use();
+	_shader.modelMatrix(modelMatrix);
+}
+
+void Mesh::scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER, vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM) {
+	_shader.use();
+	_shader.scatteringVariables(lightDir, lightSun, betaER, betaEM, betaSR, betaSM);
 }
 
 void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
@@ -112,17 +125,21 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	// Activamos el vertex array Object
 	glBindVertexArray(_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);
+
+	_shader.projectionMatrix(projection_matrix);
+	_shader.camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
+
 	// Activamos el buffer de indices
-
-	glUniformMatrix4fv(_uniformProjectionId, 1, GL_FALSE, projection_matrix);
-
-
-	for (GLuint i = 0; i < _eboDataCount; i++) {
-		glActiveTexture(GL_TEXTURE0 + 0);
-		glBindTexture(GL_TEXTURE_2D, _tso[i]);
+	for (GLuint i = 1; i < _eboDataCount; i++) {
+		PerDraw *_eboData = &_elementBufferObjectData[i];
+		if (_eboData->mat != nullptr && _eboData->mat->textureDiffuse != "") {
+			glActiveTexture(GL_TEXTURE0 + 0);
+			glBindTexture(GL_TEXTURE_2D, _tso[i]);
+		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo[i]);
 		glDrawElements(GL_TRIANGLES, _elementBufferObjectData[i].indicesCount, GL_UNSIGNED_INT, 0);
+		CheckErr();
 	}
 }
 

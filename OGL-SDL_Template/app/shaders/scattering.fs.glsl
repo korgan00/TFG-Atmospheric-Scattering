@@ -20,13 +20,15 @@ uniform mat4 projection_matrix;
 
 //uniform sampler2D texture2;
 uniform vec3 lightDir;
+uniform float lightSun;
+
 uniform vec3 cam;
 //uniform float density[TAM_X][TAM_Y];
+
 uniform vec3 betaER;
 uniform vec3 betaEM;
 uniform vec3 betaSR;
 uniform vec3 betaSM;
-uniform float lightSun;
 
 layout (location = 0) out vec4 color;
 
@@ -119,8 +121,9 @@ void main(void)
 	vec3 extintion = exp(-(dPC.x * betaER + dPC.y * betaEM));
 
 	//color = vs_fs_color;
-	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.xy).rgb *extintion;
-	color = vec4(L0_Ext, 1.0f);//vec4(1.0f - exp(-0.9f * (L0_Ext + inScattering) ), 1);
+	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.xy).rgb * extintion;
+	//color = vec4(1.0f - exp(-0.9f * (L0_Ext + inScattering) ), 1);
+	color = vec4(L0_Ext, 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);
 	//color = vec4(L0_Ext + inScattering, 1);
 	//color = vec4(phase_mieScattering, phase_mieScattering, phase_mieScattering, 1);
