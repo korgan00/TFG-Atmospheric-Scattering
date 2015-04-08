@@ -4,12 +4,12 @@
 const GLfloat CameraFPS::MOVMENT = 0.05f;
 const GLfloat CameraFPS::ROTATION = 0.15f;
 const GLfloat CameraFPS::MOUSE_ROTATION = 180.0f;
-const GLfloat CameraFPS::RENDER_DISTANCE = 9000.0f;
+const GLfloat CameraFPS::RENDER_DISTANCE = 14000000.0f;
 
 CameraFPS::CameraFPS(SDL_Window* w) :
 		_captureMouse(false), _wrapping(false), _window(w), _velocity(0, 0, 0),
 		_rotating(0, 0, 0), _xRotation(0), _yRotation(0), _updateRotation(true),
-		_currentTranslation(vmath::mat4::identity()), _disableCamera(false) {
+		_currentTranslation(vmath::mat4::identity()), _disableCamera(false), _turbo(GL_FALSE) {
 
 	int winWidth, winHeight;
 	SDL_GetWindowSize(_window, &winWidth, &winHeight);
@@ -36,6 +36,7 @@ void CameraFPS::Event(SDL_Event* event) {
 		case SDLK_d:	 move(X, POSITIVE); break;
 		case SDLK_LCTRL: move(Y, NEGATIVE); break;
 		case SDLK_SPACE: move(Y, POSITIVE); break;
+		case SDLK_z:	 turbo(!turbo());	break;
 
 		case SDLK_q:	 rotate(Y, NEGATIVE); break;
 		case SDLK_e:	 rotate(Y, POSITIVE); break;
@@ -97,6 +98,7 @@ void CameraFPS::tick(GLfloat time, GLfloat elapsedTime) {
 
 			translation[3] = 0;
 			translation[2] = -translation[2];
+			if (_turbo) translation *= 20;
 
 			_currentTranslation[3] = _currentTranslation[3] + translation;
 		}

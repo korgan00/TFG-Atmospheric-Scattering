@@ -5,7 +5,7 @@ const char* Engine::WIN_TITLE = "Titulo de la Ventana";
 
 Engine::Engine() : _running(false), _window(nullptr), _ctxt(nullptr), _info(),
 					_old_t((GLfloat)GetTickCount()), _t(0.0f), _dt(0.0f), 
-					_camera(nullptr), _mesh(nullptr) {}
+					_camera(nullptr), _scene() {}
 
 int Engine::OnExecute() {
 	if (!Init()) return -1;
@@ -76,7 +76,7 @@ void Engine::InitData() {
 	//_scene.addObjects(cubes);
 
 	//_scene.initOGLData();
-
+	/*
 	vmath::vec3 lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
 	GLfloat lightSun = 20.0f;
 	// usamos la unidad de openGL como "un metro"
@@ -87,13 +87,17 @@ void Engine::InitData() {
 
 	vmath::vec3 betaER = betaSR;
 	vmath::vec3 betaEM = betaSM * 1.1f;
-
+	*/
+	/*
 	ObjLoader::ObjFileInfo* obj = ObjLoader::load("Arid.obj");
 	_mesh = ObjToMesh::convert(obj, new MountainTextureFactory());
 	//_mesh = ObjToMesh::convert(obj);
 	_mesh->initOGLData();
 	_mesh->scatteringVariables(lightDir, lightSun, betaER, betaEM, betaSR, betaSM);
 	_mesh->modelMatrix(vmath::translate(0.0f, -200.0f, 0.0f));
+	*/
+
+	_scene.initOGLData();
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -154,8 +158,8 @@ void Engine::OnLoop() {
 void Engine::OnCleanup() {
 	glUseProgram(0); //clear shader
 
-	_mesh->cleanup();
-	//_scene.cleanup();
+	//_mesh->cleanup();
+	_scene.cleanup();
 	//forEach(_scene, &Mesh::cleanup);
 	//forEach(_cube, &Mesh::cleanup);
 
@@ -171,9 +175,9 @@ void Engine::OnRender() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	_mesh->draw(_camera.matrix(), _camera.position());
+	//_mesh->draw(_camera.matrix(), _camera.position());
 
-	//_scene.draw(_camera.matrix(), _camera.position());
+	_scene.draw(_camera.matrix(), _camera.position());
 
 	SDL_GL_SwapWindow(_window);
 }

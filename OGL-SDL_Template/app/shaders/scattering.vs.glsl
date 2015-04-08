@@ -19,9 +19,9 @@ void main(void) {
 	//if (i > 1) i = 1;
 	//vs_fs_color = vec4(i, 0, 0, 1);*/
 
-	vec3 pos = vPos * 10;
+	vec4 pos = (model_matrix * vec4(vPos, 1));
 	//pos.y -= 5;
 	vs_fs_color = vec4(vTex, 0, 1);
-	gl_Position = projection_matrix * (model_matrix * vec4(pos, 1));
-	obj = pos;
+	gl_Position = projection_matrix * pos;
+	obj = pos.xyz;
 }

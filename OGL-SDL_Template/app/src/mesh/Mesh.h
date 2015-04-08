@@ -55,12 +55,15 @@ public:
 		_vertexBufferObjectData(verticesInfo), _vboDataCount(verticesCount), 
 		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount), _shader() {}
 
-	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
+	// SETTERS
 	void modelMatrix(vmath::mat4 modelMatrix);
-	void scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER, 
+	void scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER,
 		vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM);
+
+	//ACTIONS
 	void initOGLData();
 	void cleanup();
+	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 };
 
 

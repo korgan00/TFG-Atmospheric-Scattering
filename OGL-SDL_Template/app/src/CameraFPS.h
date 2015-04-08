@@ -32,6 +32,7 @@ private:
 	GLboolean _disableCamera;
 	GLboolean _wrapping;
 	GLboolean _updateRotation;
+	GLboolean _turbo;
 
 	void mouseMotionCaptured(SDL_Event* event) {
 		if (_wrapping) {
@@ -77,6 +78,9 @@ public:
 
 	inline vmath::vec4 position() { return -_currentTranslation[3]; }
 	inline void position(vmath::vec4 v) { _currentTranslation[3] = -v; }
+
+	void turbo(GLboolean state) { _turbo = state; }
+	inline GLboolean turbo() { return _turbo; }
 
 	void mouseIsCaptured(GLboolean state);
 	inline GLboolean mouseIsCaptured() { return _captureMouse; }

@@ -27,9 +27,6 @@
     <ClCompile Include="app\src\main.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
-    <ClCompile Include="app\src\Demo_OGL_4.cpp">
-      <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
     <ClCompile Include="app\common\gl3w.c">
       <Filter>Archivos de código fuente\common</Filter>
     </ClCompile>
@@ -40,9 +37,6 @@
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
     <ClCompile Include="app\src\CameraFPS.cpp">
-      <Filter>Archivos de código fuente</Filter>
-    </ClCompile>
-    <ClCompile Include="app\src\Demo_OGL_Mesh.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
     <ClCompile Include="app\common\Logger.cpp">
@@ -60,11 +54,11 @@
     <ClCompile Include="app\common\common.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
+    <ClCompile Include="app\src\ScatteringScene.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="app\src\Demo_OGL_4.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
     <ClInclude Include="app\common\vmath.h">
       <Filter>Archivos de encabezado\common</Filter>
     </ClInclude>
@@ -81,9 +75,6 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="app\src\CameraFPS.h">
-      <Filter>Archivos de encabezado</Filter>
-    </ClInclude>
-    <ClInclude Include="app\src\Demo_OGL_Mesh.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="app\src\Shader.h">
@@ -105,6 +96,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="app\src\mesh\MountainTextureFactory.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="app\src\ScatteringScene.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>

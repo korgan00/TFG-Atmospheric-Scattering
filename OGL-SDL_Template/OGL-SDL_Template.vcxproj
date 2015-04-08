@@ -16,13 +16,12 @@
     <ClCompile Include="app\common\LoadShaders.cpp" />
     <ClCompile Include="app\common\Logger.cpp" />
     <ClCompile Include="app\src\CameraFPS.cpp" />
-    <ClCompile Include="app\src\Demo_OGL_4.cpp" />
-    <ClCompile Include="app\src\Demo_OGL_Mesh.cpp" />
     <ClCompile Include="app\src\Engine.cpp" />
     <ClCompile Include="app\src\main.cpp" />
     <ClCompile Include="app\src\mesh\Mesh.cpp" />
     <ClCompile Include="app\src\mesh\ObjLoader.cpp" />
     <ClCompile Include="app\src\mesh\ObjToMesh.cpp" />
+    <ClCompile Include="app\src\ScatteringScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\common.h" />
@@ -31,13 +30,12 @@
     <ClInclude Include="app\common\Logger.h" />
     <ClInclude Include="app\common\vmath.h" />
     <ClInclude Include="app\src\CameraFPS.h" />
-    <ClInclude Include="app\src\Demo_OGL_4.h" />
-    <ClInclude Include="app\src\Demo_OGL_Mesh.h" />
     <ClInclude Include="app\src\Engine.h" />
     <ClInclude Include="app\src\mesh\Mesh.h" />
     <ClInclude Include="app\src\mesh\MountainTextureFactory.h" />
     <ClInclude Include="app\src\mesh\ObjLoader.h" />
     <ClInclude Include="app\src\mesh\ObjToMesh.h" />
+    <ClInclude Include="app\src\ScatteringScene.h" />
     <ClInclude Include="app\src\Scene.h" />
     <ClInclude Include="app\src\Shader.h" />
   </ItemGroup>

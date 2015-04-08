@@ -22,7 +22,7 @@ void Mesh::initOGLData() {
 	glGenBuffers(_eboDataCount, _ebo);
 	glGenTextures(_eboDataCount, _tso);
 
-	for (GLuint i = 1; i < _eboDataCount; i++) {
+	for (GLuint i = 0; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
 		_eboData->indicesSize = _eboData->indicesCount * sizeof(GLuint);
 		
@@ -130,7 +130,7 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	_shader.camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
 
 	// Activamos el buffer de indices
-	for (GLuint i = 1; i < _eboDataCount; i++) {
+	for (GLuint i = 0; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
 		if (_eboData->mat != nullptr && _eboData->mat->textureDiffuse != "") {
 			glActiveTexture(GL_TEXTURE0 + 0);

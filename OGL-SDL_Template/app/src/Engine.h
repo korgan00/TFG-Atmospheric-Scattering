@@ -14,7 +14,7 @@
 #include "../common/common.h"
 #include "mesh/ObjLoader.h"
 #include "CameraFPS.h"
-//#include "Scene.h"
+#include "ScatteringScene.h"
 #include "mesh/ObjLoader.h"
 #include "mesh/ObjToMesh.h"
 #include "mesh/MountainTextureFactory.h"
@@ -37,10 +37,10 @@ private:
 	/***************************************************/
 
 	CameraFPS _camera;
-	//Scene _scene;
+	ScatteringScene _scene;
 	//vector<Mesh> _scene;
 	//vector<Mesh> _cube;
-	Mesh *_mesh;
+	//Mesh *_mesh;
 
 public:
 
