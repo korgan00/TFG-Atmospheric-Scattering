@@ -16,8 +16,11 @@ int Engine::OnExecute() {
 		while (SDL_PollEvent(&event))
 			Event(&event);
 
+		CheckErr();
 		Loop();
+		CheckErr();
 		Render();
+		CheckErr();
 
 		_info.frame(_window, WIN_TITLE);
 	}

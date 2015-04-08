@@ -47,7 +47,7 @@ public:
 
 
 		_scatteringUniforms.lightDir = glGetUniformLocation(_renderProg, "lightDir");
-		_scatteringUniforms.lightSun = glGetUniformLocation(_renderProg, "lightDir");
+		_scatteringUniforms.lightSun = glGetUniformLocation(_renderProg, "lightSun");
 
 		_scatteringUniforms.cam = glGetUniformLocation(_renderProg, "cam");
 		//_scatteringUniforms.density = glGetUniformLocation(_renderProg, "density");

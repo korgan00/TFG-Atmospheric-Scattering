@@ -98,7 +98,7 @@ void CameraFPS::tick(GLfloat time, GLfloat elapsedTime) {
 
 			translation[3] = 0;
 			translation[2] = -translation[2];
-			if (_turbo) translation *= 20;
+			if (_turbo) translation *= 200;
 
 			_currentTranslation[3] = _currentTranslation[3] + translation;
 		}

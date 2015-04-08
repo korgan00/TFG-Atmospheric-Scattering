@@ -120,14 +120,17 @@ void Mesh::scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::ve
 }
 
 void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
+	CheckErr();
 	_shader.use();
 
+	CheckErr();
 	// Activamos el vertex array Object
 	glBindVertexArray(_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);
 
 	_shader.projectionMatrix(projection_matrix);
 	_shader.camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
+	CheckErr();
 
 	// Activamos el buffer de indices
 	for (GLuint i = 0; i < _eboDataCount; i++) {
@@ -135,9 +138,11 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 		if (_eboData->mat != nullptr && _eboData->mat->textureDiffuse != "") {
 			glActiveTexture(GL_TEXTURE0 + 0);
 			glBindTexture(GL_TEXTURE_2D, _tso[i]);
+			CheckErr();
 		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo[i]);
+		CheckErr();
 		glDrawElements(GL_TRIANGLES, _elementBufferObjectData[i].indicesCount, GL_UNSIGNED_INT, 0);
 		CheckErr();
 	}

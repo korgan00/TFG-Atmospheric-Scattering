@@ -1,8 +1,11 @@
 #version 430
 
-#define N_STEPS 30.0f
+#define N_STEPS 20.0f
 #define H_R 7994.0f
 #define H_M 1200.0f
+#define WORLD_RADIUS 6360000.0f
+#define ATM_TOP_HEIGHT 80000.0f
+#define ATM_RADIUS WORLD_RADIUS + ATM_TOP_HEIGHT
 //#define H_R 79.0f
 //#define H_M 10.0f
 #define TAM_X 25
@@ -44,60 +47,81 @@ void main(void)
 
 
 	//vec3 dP = (obj - cam) / N_STEPS;
-	vec3 dP = (obj - cam) / N_STEPS;
-	float ds = length(dP);
+	vec3 delta_P = (obj - cam) / N_STEPS;
+	float diferential_s = length(delta_P);
 
 	
-	vec2 dPC = vec2(0, 0);
-	vec3 rayLeigh = vec3(0, 0, 0);
-	vec3 mieScattering = vec3(0, 0, 0);
+	vec2 density_PC = vec2(0, 0);
+	vec3 rayLeigh_In = vec3(0, 0, 0);
+	vec3 mie_In = vec3(0, 0, 0);
 
+	vec3 cEarth = vec3(0.0f, -WORLD_RADIUS, 0.0f);
 	for (float s = 0.5f; s < N_STEPS; s += 1.0f){
 
-		vec3 point = cam + dP * s;
+		vec3 point = cam + delta_P * s;
 
-		float h = point.y; // = lenght(point - Cearth) - Rearth
-		vec3 normalEarth = vec3(0, 1, 0); // = point - Cearth / length(point - Cearth)
+		float h = length(point - cEarth) - WORLD_RADIUS;
 
-		vec2 pRM = P0 * exp(-h / vec2(H_R, H_M));
+		if (h < ATM_TOP_HEIGHT) {
 
-		//float cosPhi = dot(-normLightDir, normalEarth) / length(normalEarth);
-		float cosPhi = dot(normalEarth, -normLightDir);//    / length(normLightDir);
+			vec3 normalEarth = point - cEarth / length(point - cEarth);
 
-		//vec2 dAP = density[h][cosPhi];
-		/******* TO TABLE ********/
-		vec2 dAP = vec2(0.0, 0.0);
-		vec2 dA = (vec2(H_R, H_M) - h) / cosPhi;
-		dA = dA / N_STEPS;
-		float dh = length(dA);
+			vec2 partDenRM = P0 * exp(-h / vec2(H_R, H_M));
 
-		for (float step = 0.5f; step < N_STEPS; step += 1.0f) {
-			vec2 hPoint = h + dA * step;
-			dAP += exp(-hPoint / vec2(H_R, H_M)) * dh;
-		}//*/
+			//float cosPhi = dot(-normLightDir, normalEarth) / length(normalEarth);
+			float cosPhi = dot(normalEarth, -normLightDir);//    / length(normLightDir);
 
-		//vec2 dAP = vec2(0.5f, 0.5f);
+			//vec2 dAP = density[h][cosPhi];
+			/******* TO TABLE ********/
+			vec2 density_AP = vec2(0.0, 0.0);
+			/*vec2 delta_A = (vec2(H_R, H_M) - h) / cosPhi;
+			delta_A = delta_A / N_STEPS;
+			float diferential_h = length(delta_A);//Cuidado*/
+			// CALCULAR PUNTO DE LA ATMOSFERA!!
+			float comp_cosPhi = -cosPhi;
+			float point_earth = length(point - cEarth);
+			float b = 2 * point_earth * cosPhi;
+			float c = point_earth * point_earth - ATM_RADIUS * ATM_RADIUS;
+			float a1 = (b + sqrt(b*b - 4 * c)) / 2;
+			float a2 = (b - sqrt(b*b - 4 * c)) / 2;
+			vec3 A1 = -normLightDir * a1 + point;
+			vec3 A2 = -normLightDir * a2 + point;
+			vec3 A;
+			float a1_c = abs(length(A1 - cEarth) - ATM_RADIUS);
+			float a2_c = abs(length(A2 - cEarth) - ATM_RADIUS);
+			A = a1_c < a2_c ? A1 : A2;
 
-		dPC += pRM * ds;
+			vec3 delta_A = (point - A) / N_STEPS;
+			float diferential_h = length(delta_A);
 
-		vec2 dAPC = dAP + dPC;
+			for (float step = 0.5f; step < N_STEPS; step += 1.0f) {
+				float hPoint = length((A + delta_A * step) - cEarth) - WORLD_RADIUS;
+				density_AP += exp(-vec2(hPoint, hPoint) / vec2(H_R, H_M)) * diferential_h;
+			}
+			//density_AP = vec2(80000, 80000);
 
-		vec3 tR = dAPC.x * betaER;
-		vec3 tM = dAPC.y * betaEM;
+			//vec2 dAP = vec2(0.5f, 0.5f);
 
-		vec3 tRM = tR + tM;
-		vec3 extRM = exp(-(tRM));
+			density_PC += partDenRM * diferential_s;
 
-		vec3 difLR = pRM.x * betaSR * extRM * ds;
-		vec3 difLM = pRM.y * betaSM * extRM * ds;
+			vec2 density_APC = density_AP + density_PC;
 
-		// Calcular visibilidad de P
+			//vec3 tR = density_APC.x * betaER;
+			//vec3 tM = density_APC.y * betaEM;
 
-		float visi = 1;
+			//vec3 opticalDepthRM = density_APC.x * betaER + density_APC.y * betaEM;
+			vec3 extinction_RM = exp(-( density_APC.x * betaER + density_APC.y * betaEM ));
 
-		rayLeigh += difLR * visi;
-		mieScattering += difLM * visi;
+			vec3 difLR = partDenRM.x * betaSR * extinction_RM * diferential_s;
+			vec3 difLM = partDenRM.y * betaSM * extinction_RM * diferential_s;
 
+			// Calcular visibilidad de P
+
+			float visi = 1;
+
+			rayLeigh_In += difLR * visi;
+			mie_In += difLM * visi;
+		}
 	}
 
 	//float cosTheta = cos(lightDir + view);
@@ -117,13 +141,13 @@ void main(void)
 	//ApplyPhaseFunctions(rayLeigh, mieScattering, cosTheta);
 
 	//vec3 inScattering = (rayLeigh + mieScattering) * lightSun;
-	vec3 inScattering = (rayLeigh * phase_rayLeigh + mieScattering * phase_mieScattering) * lightSun;
-	vec3 extintion = exp(-(dPC.x * betaER + dPC.y * betaEM));
+	vec3 inScattering = (rayLeigh_In * phase_rayLeigh + mie_In * phase_mieScattering) * lightSun;
+	vec3 extintion = exp(-(density_PC.x * betaER + density_PC.y * betaEM));
 
 	//color = vs_fs_color;
 	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.xy).rgb * extintion;
-	//color = vec4(1.0f - exp(-0.9f * (L0_Ext + inScattering) ), 1);
-	color = vec4(L0_Ext, 1);
+	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1);
+	//color = vec4(L0_Ext, 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);
 	//color = vec4(L0_Ext + inScattering, 1);
 	//color = vec4(phase_mieScattering, phase_mieScattering, phase_mieScattering, 1);
