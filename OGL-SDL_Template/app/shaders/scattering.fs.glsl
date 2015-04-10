@@ -11,8 +11,6 @@
 #define TAM_X 25
 #define TAM_Y 25
 #define M_PI 3.1415926535897932384626433832795
-#define _3_16pi (3 / (16 * M_PI))
-#define _3_8pi (3 / (8 * M_PI))
 #define G 0.76
 #define G2 (G*G)
 #define P0 1
@@ -40,14 +38,21 @@ in vec3 obj;
 
 void main(void)
 {
+	float _3_16pi = 3 / (16 * M_PI);
+	float _3_8pi = 3 / (8 * M_PI);
+	float atm_Radius = ATM_RADIUS;
+	float atm_Radius_2 = atm_Radius * atm_Radius;
+	vec3 cEarth = vec3(0.0f, -WORLD_RADIUS, 0.0f);
+
 	// Calculo view
 	mat4 projTrans = transpose(projection_matrix);
 	vec3 view = normalize(projTrans[2].xyz);
 	vec3 normLightDir = normalize(lightDir);
 
+	vec3 computedCam = normalize(cam - cEarth) * min(atm_Radius, length(cam - cEarth)) + cEarth;
 
-	//vec3 dP = (obj - cam) / N_STEPS;
-	vec3 delta_P = (obj - cam) / N_STEPS;
+	//vec3 dP = (obj - computedCam) / N_STEPS;
+	vec3 delta_P = (obj - computedCam) / N_STEPS;
 	float diferential_s = length(delta_P);
 
 	
@@ -55,16 +60,16 @@ void main(void)
 	vec3 rayLeigh_In = vec3(0, 0, 0);
 	vec3 mie_In = vec3(0, 0, 0);
 
-	vec3 cEarth = vec3(0.0f, -WORLD_RADIUS, 0.0f);
 	for (float s = 0.5f; s < N_STEPS; s += 1.0f){
 
-		vec3 point = cam + delta_P * s;
+		vec3 point = computedCam + delta_P * s;
 
 		float h = length(point - cEarth) - WORLD_RADIUS;
 
 		if (h < ATM_TOP_HEIGHT) {
 
-			vec3 normalEarth = point - cEarth / length(point - cEarth);
+			//vec3 normalEarth = point - cEarth / length(point - cEarth);
+			vec3 normalEarth = normalize(point - cEarth);
 
 			vec2 partDenRM = P0 * exp(-h / vec2(H_R, H_M));
 
@@ -78,27 +83,66 @@ void main(void)
 			delta_A = delta_A / N_STEPS;
 			float diferential_h = length(delta_A);//Cuidado*/
 			// CALCULAR PUNTO DE LA ATMOSFERA!!
+			
 			float comp_cosPhi = -cosPhi;
 			float point_earth = length(point - cEarth);
-			float b = 2 * point_earth * cosPhi;
-			float c = point_earth * point_earth - ATM_RADIUS * ATM_RADIUS;
-			float a1 = (b + sqrt(b*b - 4 * c)) / 2;
-			float a2 = (b - sqrt(b*b - 4 * c)) / 2;
+			float b = 2 * point_earth * comp_cosPhi;
+			float c = point_earth * point_earth - atm_Radius_2;
+			float sqrtBody = b*b - 4 * c;
+			float a1 = (b + sqrt(sqrtBody)) / 2;
+			float a2 = (b - sqrt(sqrtBody)) / 2;
 			vec3 A1 = -normLightDir * a1 + point;
 			vec3 A2 = -normLightDir * a2 + point;
-			vec3 A;
+			
+			vec3 A1A2 = normalize(A2 - A1);
+			vec3 A2A1 = normalize(A1 - A2);
+			float a1a2 = length(A1A2 - normLightDir);
+			float a2a1 = length(A2A1 - normLightDir);
+			vec3 A = a1a2 < a2a1 ? A1 : A2;/*/
+			
+			
 			float a1_c = abs(length(A1 - cEarth) - ATM_RADIUS);
 			float a2_c = abs(length(A2 - cEarth) - ATM_RADIUS);
-			A = a1_c < a2_c ? A1 : A2;
+			float a = a1_c < a2_c ? a1 : a2;
+			vec3 A = -normLightDir * a + point;
+			//A = A1;
+			//*/
+			/*
+			float point_earth = length(point - cEarth);
+			float b = 2 * dot(point - cEarth, -normLightDir);
+			float c = point_earth * point_earth - ATM_RADIUS_2;
+			float a1 = (-b + sqrt(b*b - 4 * c)) / 2;
+			float a2 = (-b - sqrt(b*b - 4 * c)) / 2;
+			vec3 A1 = -normLightDir * a1 + point;
+			vec3 A2 = -normLightDir * a2 + point;
+
+			float a1_c = abs(length(A1 - cEarth) - ATM_RADIUS);
+			float a2_c = abs(length(A2 - cEarth) - ATM_RADIUS);
+			float a = a1_c < a2_c ? a1 : a2;
+			vec3 A = -normLightDir * a + point;
+			*/
+
 
 			vec3 delta_A = (point - A) / N_STEPS;
 			float diferential_h = length(delta_A);
 
 			for (float step = 0.5f; step < N_STEPS; step += 1.0f) {
-				float hPoint = length((A + delta_A * step) - cEarth) - WORLD_RADIUS;
-				density_AP += exp(-vec2(hPoint, hPoint) / vec2(H_R, H_M)) * diferential_h;
-			}
+				float hPoint = (length((A + delta_A * step) - cEarth) - WORLD_RADIUS);
+				density_AP += exp( -hPoint / vec2(H_R, H_M)) * diferential_h;
+			}/*/
+
+			vec3 delta_A = (A - point) / N_STEPS;
+			float diferential_h = length(delta_A);
+
+			for (float step = 0.5f; step < N_STEPS; step += 1.0f) {
+				float hPoint = (length((point + delta_A * step) - cEarth) - WORLD_RADIUS);
+				density_AP += exp(-hPoint / vec2(H_R, H_M)) * diferential_h;
+			}//*/
+
 			//density_AP = vec2(80000, 80000);
+			//density_AP = vec2(10000, 10000);
+			//density_AP = vec2(1000, 1000);
+			//density_AP = vec2(1000, 1000);
 
 			//vec2 dAP = vec2(0.5f, 0.5f);
 

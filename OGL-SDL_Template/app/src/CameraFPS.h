@@ -33,6 +33,7 @@ private:
 	GLboolean _wrapping;
 	GLboolean _updateRotation;
 	GLboolean _turbo;
+	GLint _boost;
 
 	void mouseMotionCaptured(SDL_Event* event) {
 		if (_wrapping) {
@@ -81,6 +82,13 @@ public:
 
 	void turbo(GLboolean state) { _turbo = state; }
 	inline GLboolean turbo() { return _turbo; }
+
+	void boost(GLint inc) { 
+		_boost += inc; 
+		stringstream ss; ss << "turbo: " << _boost;
+		Log::info(ss.str());
+	}
+	inline GLint boost() { return _boost; }
 
 	void mouseIsCaptured(GLboolean state);
 	inline GLboolean mouseIsCaptured() { return _captureMouse; }

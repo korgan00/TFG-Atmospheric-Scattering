@@ -114,7 +114,8 @@ void Mesh::modelMatrix(vmath::mat4 modelMatrix) {
 	_shader.modelMatrix(modelMatrix);
 }
 
-void Mesh::scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER, vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM) {
+void Mesh::scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER, 
+		vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM) {
 	_shader.use();
 	_shader.scatteringVariables(lightDir, lightSun, betaER, betaEM, betaSR, betaSM);
 }
@@ -122,8 +123,6 @@ void Mesh::scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::ve
 void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	CheckErr();
 	_shader.use();
-
-	CheckErr();
 	// Activamos el vertex array Object
 	glBindVertexArray(_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);
@@ -138,11 +137,9 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 		if (_eboData->mat != nullptr && _eboData->mat->textureDiffuse != "") {
 			glActiveTexture(GL_TEXTURE0 + 0);
 			glBindTexture(GL_TEXTURE_2D, _tso[i]);
-			CheckErr();
 		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo[i]);
-		CheckErr();
 		glDrawElements(GL_TRIANGLES, _elementBufferObjectData[i].indicesCount, GL_UNSIGNED_INT, 0);
 		CheckErr();
 	}
