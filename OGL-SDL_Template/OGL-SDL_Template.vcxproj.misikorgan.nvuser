@@ -1,0 +1,5 @@
+﻿<ProjectSettingsModel DefinitionId="a218e900-1199-4ab1-a767-7976786f04d4" DisplayName="Nexus Project User Settings" xmlns="clr-namespace:Ark.PropertyModel;assembly=Ark">
+    <SettingsPointModel DefinitionId="9e01db22-a7ae-4ca9-b2a8-6a4e66dd5cb7" DisplayName="Synchronization">
+        <Property Name="ExtensionsToExclude" Value="*.a;*.c;*.cc;*.cpp;*.cs;*.cu;*.cuh;*.dep;*.doc;*.filters;*.h;*.hpp;*.idb;*.ilk;*.inl;*.ncb;*.nvact;*.nvuser;*.o;*.opensdf;*.pdb;*.sdf;*.sln;*.suo;*.tlog;*.user;*.*proj" />
+    </SettingsPointModel>
+</ProjectSettingsModel>
