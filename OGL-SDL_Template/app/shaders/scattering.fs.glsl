@@ -49,7 +49,15 @@ void main(void)
 	vec3 view = normalize(projTrans[2].xyz);
 	vec3 normLightDir = normalize(lightDir);
 
-	vec3 computedCam = normalize(cam - cEarth) * min(atm_Radius, length(cam - cEarth)) + cEarth;
+	//float obj_cEarth = length(obj - cEarth);
+
+	vec3 computedCam;
+
+	if (length(obj-cEarth) < atm_Radius) {
+		computedCam = normalize(cam - cEarth) * min(atm_Radius, length(cam - cEarth)) + cEarth;
+	} else {
+		computedCam = cam;
+	}
 
 	//vec3 dP = (obj - computedCam) / N_STEPS;
 	vec3 delta_P = (obj - computedCam) / N_STEPS;

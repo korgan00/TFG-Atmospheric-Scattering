@@ -13,7 +13,7 @@ void ScatteringScene::initOGLData() {
 
 	ObjLoader::ObjFileInfo* mountainsObj = ObjLoader::load("Arid.obj");
 	_mountains = ObjToMesh::convert(mountainsObj, new MountainTextureFactory());
-	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("waterWorld.obj");
+	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("sphere.obj");
 	_blueSphere = ObjToMesh::convert(sphereObj);
 	ObjLoader::ObjFileInfo* spaceObj = ObjLoader::load("deepSpace.obj");
 	_deepSpace = ObjToMesh::convert(spaceObj);
