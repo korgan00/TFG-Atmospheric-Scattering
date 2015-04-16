@@ -54,7 +54,7 @@ layout (location = 0) out vec4 color;
 
 void main(void)
 {
-	vec4 transfVec = vec4(1 << 24, 1 << 16, 1 << 8, 1) * 255;
+	vec4 transfVec = vec4(256 * 256 * 256, 256 * 256, 256, 1);
 	float N_STEPS = 20.0f;
 
 	float _3_16PI = 3 / (16 * M_PI);
@@ -110,10 +110,11 @@ void main(void)
 			//float densityHeight = (h / ATM_TOP_HEIGHT);
 			//float densityCosPhi = (cosPhi + 1) / 2;
 			vec2 densityCoord = vec2((h / ATM_TOP_HEIGHT), (cosPhi + 1) / 2);
+			//vec2 densityCoord = vec2((cosPhi + 1) / 2, (h / ATM_TOP_HEIGHT));
 			vec4 vDAP_Ray = texture(densityRayleigh, densityCoord);
 			vec4 vDAP_Mie = texture(densityMie, densityCoord);
-			float fDAP_Ray = dot(transfVec, vDAP_Ray);
-			float fDAP_Mie = dot(transfVec, vDAP_Mie);
+			float fDAP_Ray = dot(transfVec, vDAP_Ray.abgr);
+			float fDAP_Mie = dot(transfVec, vDAP_Mie.abgr);
 			//float density_AP_Ray = ((density_AP_Ray_v.x * 256 + density_AP_Ray_v.y) * 256 + density_AP_Ray_v.z) * 256 + density_AP_Ray_v.w;
 			//float density_AP_Mie = texture(densityMie, densityCoord).rgba;
 
