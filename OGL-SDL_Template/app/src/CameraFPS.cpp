@@ -15,7 +15,7 @@ CameraFPS::CameraFPS(SDL_Window* w) :
 	int winWidth, winHeight;
 	SDL_GetWindowSize(_window, &winWidth, &winHeight);
 	GLfloat aspect = float(DEFAULT_WIN_HEIGHT) / float(DEFAULT_WIN_WIDTH);
-	_currentMatrix = vmath::mat4(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 2000.0f));
+	_currentMatrix = vmath::mat4(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 2000.0f)) * vmath::translate(0.0f, 100.0f, 0.0f);
 }
 
 void CameraFPS::Event(SDL_Event* event) {
@@ -106,8 +106,8 @@ void CameraFPS::tick(GLfloat time, GLfloat elapsedTime) {
 
 			translation[3] = 0;
 			translation[2] = -translation[2];
-			if (_turbo) translation *= _boost;
-
+			if (_turbo) translation *= (float)_boost;
+ 
 			_currentTranslation[3] = _currentTranslation[3] + translation;
 		}
 		int winWidth, winHeight;

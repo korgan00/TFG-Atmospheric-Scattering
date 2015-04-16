@@ -1,5 +1,43 @@
 #version 430
 
+//#define N_STEPS 20.0f
+
+// CONTANTS
+uniform float H_R;
+uniform float H_M;
+uniform float WORLD_RADIUS;
+uniform float ATM_TOP_HEIGHT;
+uniform float ATM_RADIUS;
+uniform float ATM_RADIUS_2;
+uniform float M_PI;
+uniform float _3_16PI;
+uniform float _3_8PI;
+uniform float G;
+uniform float G2;
+uniform float P0;
+
+// PSEUDO-CONTANTS
+uniform vec3 lightDir;
+uniform float lightSun;
+
+uniform vec3 betaER;
+uniform vec3 betaEM;
+uniform vec3 betaSR;
+uniform vec3 betaSM;
+
+// VARIABLES
+uniform sampler2D texture_diffuse;
+uniform sampler2D densityRayleigh;
+uniform sampler2D densityMie;
+uniform mat4 projection_matrix;
+
+uniform vec3 cam;
+
+in vec4 vs_fs_color;
+in vec3 obj;
+
+layout (location = 0) out vec4 color;
+/*
 #define N_STEPS 20.0f
 #define H_R 7994.0f
 #define H_M 1200.0f
@@ -8,40 +46,21 @@
 #define ATM_RADIUS WORLD_RADIUS + ATM_TOP_HEIGHT
 //#define H_R 79.0f
 //#define H_M 10.0f
-#define TAM_X 25
-#define TAM_Y 25
 #define M_PI 3.1415926535897932384626433832795
 #define G 0.76
 #define G2 (G*G)
 #define P0 1
-
-
-uniform sampler2D texture_diffuse;
-uniform mat4 projection_matrix;
-
-//uniform sampler2D texture2;
-uniform vec3 lightDir;
-uniform float lightSun;
-
-uniform vec3 cam;
-//uniform float density[TAM_X][TAM_Y];
-
-uniform vec3 betaER;
-uniform vec3 betaEM;
-uniform vec3 betaSR;
-uniform vec3 betaSM;
-
-layout (location = 0) out vec4 color;
-
-in vec4 vs_fs_color;
-in vec3 obj;
+*/
 
 void main(void)
 {
-	float _3_16pi = 3 / (16 * M_PI);
-	float _3_8pi = 3 / (8 * M_PI);
-	float atm_Radius = ATM_RADIUS;
-	float atm_Radius_2 = atm_Radius * atm_Radius;
+	vec4 transfVec = vec4(1 << 24, 1 << 16, 1 << 8, 1) * 255;
+	float N_STEPS = 20.0f;
+
+	float _3_16PI = 3 / (16 * M_PI);
+	float _3_8PI = 3 / (8 * M_PI);
+	//float atm_Radius = ATM_RADIUS;
+	//float atm_Radius_2 = ATM_RADIUS * ATM_RADIUS;
 	vec3 cEarth = vec3(0.0f, -WORLD_RADIUS, 0.0f);
 
 	// Calculo view
@@ -53,8 +72,8 @@ void main(void)
 
 	vec3 computedCam;
 
-	if (length(obj-cEarth) < atm_Radius) {
-		computedCam = normalize(cam - cEarth) * min(atm_Radius, length(cam - cEarth)) + cEarth;
+	if (length(obj-cEarth) < ATM_RADIUS) {
+		computedCam = normalize(cam - cEarth) * min(ATM_RADIUS, length(cam - cEarth)) + cEarth;
 	} else {
 		computedCam = cam;
 	}
@@ -86,50 +105,41 @@ void main(void)
 
 			//vec2 dAP = density[h][cosPhi];
 			/******* TO TABLE ********/
-			vec2 density_AP = vec2(0.0, 0.0);
+			//uniform sampler2D densityRayleigh;
+			//uniform sampler2D densityMie;
+			//float densityHeight = (h / ATM_TOP_HEIGHT);
+			//float densityCosPhi = (cosPhi + 1) / 2;
+			vec2 densityCoord = vec2((h / ATM_TOP_HEIGHT), (cosPhi + 1) / 2);
+			vec4 vDAP_Ray = texture(densityRayleigh, densityCoord);
+			vec4 vDAP_Mie = texture(densityMie, densityCoord);
+			float fDAP_Ray = dot(transfVec, vDAP_Ray);
+			float fDAP_Mie = dot(transfVec, vDAP_Mie);
+			//float density_AP_Ray = ((density_AP_Ray_v.x * 256 + density_AP_Ray_v.y) * 256 + density_AP_Ray_v.z) * 256 + density_AP_Ray_v.w;
+			//float density_AP_Mie = texture(densityMie, densityCoord).rgba;
+
+			vec2 density_AP = vec2(fDAP_Ray, fDAP_Mie);
 			/*vec2 delta_A = (vec2(H_R, H_M) - h) / cosPhi;
 			delta_A = delta_A / N_STEPS;
 			float diferential_h = length(delta_A);//Cuidado*/
 			// CALCULAR PUNTO DE LA ATMOSFERA!!
-			
+			/*
 			float comp_cosPhi = -cosPhi;
 			float point_earth = length(point - cEarth);
 			float b = 2 * point_earth * comp_cosPhi;
-			float c = point_earth * point_earth - atm_Radius_2;
+			float c = point_earth * point_earth - ATM_RADIUS_2;
 			float sqrtBody = b*b - 4 * c;
 			float a1 = (b + sqrt(sqrtBody)) / 2;
 			float a2 = (b - sqrt(sqrtBody)) / 2;
-			vec3 A1 = -normLightDir * a1 + point;
-			vec3 A2 = -normLightDir * a2 + point;
-			
-			vec3 A1A2 = normalize(A2 - A1);
-			vec3 A2A1 = normalize(A1 - A2);
-			float a1a2 = length(A1A2 - normLightDir);
-			float a2a1 = length(A2A1 - normLightDir);
-			vec3 A = a1a2 < a2a1 ? A1 : A2;/*/
-			
-			
-			float a1_c = abs(length(A1 - cEarth) - ATM_RADIUS);
-			float a2_c = abs(length(A2 - cEarth) - ATM_RADIUS);
-			float a = a1_c < a2_c ? a1 : a2;
-			vec3 A = -normLightDir * a + point;
-			//A = A1;
-			//*/
-			/*
-			float point_earth = length(point - cEarth);
-			float b = 2 * dot(point - cEarth, -normLightDir);
-			float c = point_earth * point_earth - ATM_RADIUS_2;
-			float a1 = (-b + sqrt(b*b - 4 * c)) / 2;
-			float a2 = (-b - sqrt(b*b - 4 * c)) / 2;
-			vec3 A1 = -normLightDir * a1 + point;
-			vec3 A2 = -normLightDir * a2 + point;
 
-			float a1_c = abs(length(A1 - cEarth) - ATM_RADIUS);
-			float a2_c = abs(length(A2 - cEarth) - ATM_RADIUS);
-			float a = a1_c < a2_c ? a1 : a2;
-			vec3 A = -normLightDir * a + point;
-			*/
-
+			//vec3 A1 = -normLightDir * a1 + point;
+			//vec3 A2 = -normLightDir * a2 + point;
+			
+			//vec3 A1A2 = normalize(A2 - A1);
+			//vec3 A2A1 = normalize(A1 - A2);
+			//float a1a2 = length(A1A2 - normLightDir);
+			//float a2a1 = length(A2A1 - normLightDir);
+			//vec3 A = a1a2 < a2a1 ? A1 : A2;
+			vec3 A = -normLightDir * max(a1, a2) + point;
 
 			vec3 delta_A = (point - A) / N_STEPS;
 			float diferential_h = length(delta_A);
@@ -138,7 +148,7 @@ void main(void)
 				float hPoint = (length((A + delta_A * step) - cEarth) - WORLD_RADIUS);
 				density_AP += exp( -hPoint / vec2(H_R, H_M)) * diferential_h;
 			}/*/
-
+			/*
 			vec3 delta_A = (A - point) / N_STEPS;
 			float diferential_h = length(delta_A);
 
@@ -147,7 +157,7 @@ void main(void)
 				density_AP += exp(-hPoint / vec2(H_R, H_M)) * diferential_h;
 			}//*/
 
-			//density_AP = vec2(80000, 80000);
+			//density_AP = vec2(90000, 12000);
 			//density_AP = vec2(10000, 10000);
 			//density_AP = vec2(1000, 1000);
 			//density_AP = vec2(1000, 1000);
@@ -186,9 +196,9 @@ void main(void)
 
 	// Apply Phase Functions 
 	// RAY
-	float phase_rayLeigh = _3_16pi * cos2ThetaP1;
+	float phase_rayLeigh = _3_16PI * cos2ThetaP1;
 	// MIE
-	float phase_mieScattering = _3_8pi * (((1.0f - G2) * cos2ThetaP1) / ((2.0f + G2) * pow(1.0f + G2 - 2.0f * G*cosTheta, 1.5f)));
+	float phase_mieScattering = _3_8PI * (((1.0f - G2) * cos2ThetaP1) / ((2.0f + G2) * pow(1.0f + G2 - 2.0f * G*cosTheta, 1.5f)));
 
 	//ApplyPhaseFunctions(rayLeigh, mieScattering, cosTheta);
 
@@ -201,7 +211,7 @@ void main(void)
 	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1);
 	//color = vec4(L0_Ext, 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);
-	//color = vec4(L0_Ext + inScattering, 1);
+	//color = vec4(inScattering, 1);
 	//color = vec4(phase_mieScattering, phase_mieScattering, phase_mieScattering, 1);
 	//color = vec4(inScattering, 1);
 	//color = vec4(extintion, 1);

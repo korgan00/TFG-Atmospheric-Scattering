@@ -22,6 +22,7 @@
     <ClCompile Include="app\src\mesh\ObjLoader.cpp" />
     <ClCompile Include="app\src\mesh\ObjToMesh.cpp" />
     <ClCompile Include="app\src\ScatteringScene.cpp" />
+    <ClCompile Include="app\src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\common.h" />

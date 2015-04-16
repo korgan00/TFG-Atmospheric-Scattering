@@ -39,7 +39,9 @@ void Mesh::initOGLData() {
 
 			int mode = _texture->format->BytesPerPixel == 4? GL_RGBA : GL_RGB;
 
-			glTexImage2D(GL_TEXTURE_2D, 0, mode, _texture->w, _texture->h, 0, mode, GL_UNSIGNED_BYTE, _texture->pixels);
+			glTexImage2D(GL_TEXTURE_2D, 0, mode, _texture->w, _texture->h, 0, 
+				mode, GL_UNSIGNED_BYTE, _texture->pixels);
+
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glGenerateMipmap(GL_TEXTURE_2D);
@@ -112,13 +114,20 @@ void Mesh::cleanup() {
 void Mesh::modelMatrix(vmath::mat4 modelMatrix) {
 	_shader.use();
 	_shader.modelMatrix(modelMatrix);
+	CheckErr();
 }
 
-void Mesh::scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER, 
-		vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM) {
+void Mesh::scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues){
 	_shader.use();
-	_shader.scatteringVariables(lightDir, lightSun, betaER, betaEM, betaSR, betaSM);
+	_shader.scatteringVariables(scattValues);
+	CheckErr();
 }
+void Mesh::scatteringConstants(Shader::ScatteringUniformConstants_values scattValues){
+	_shader.use();
+	_shader.scatteringConstants(scattValues);
+	CheckErr();
+}
+
 
 void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	CheckErr();
@@ -130,6 +139,11 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	_shader.projectionMatrix(projection_matrix);
 	_shader.camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
 	CheckErr();
+
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, _shader._tso[0]);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, _shader._tso[1]);
 
 	// Activamos el buffer de indices
 	for (GLuint i = 0; i < _eboDataCount; i++) {

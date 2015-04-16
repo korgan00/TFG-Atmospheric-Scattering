@@ -9,6 +9,7 @@
 #define SHADER_H_
 #include <iostream>
 #include <math.h>
+#include "SDL_image.h"
 
 #include "../common/common.h"
 
@@ -17,25 +18,65 @@ public:
 	typedef struct {
 		GLuint projectionMatrix;
 		GLuint modelMatrix;
+		GLuint cam;			//VEC3
 	} CommonUniforms;
 
 	typedef struct {
 		GLuint lightDir;	//VEC3
 		GLuint lightSun;	//FLOAT
 
-		GLuint cam;			//VEC3
-		GLuint density;		//FLOAT[][]
+		//GLuint cam;			//VEC3
+		//GLuint density;		//FLOAT[][]
 
 		GLuint betaER;		//VEC3
 		GLuint betaEM;		//VEC3
 		GLuint betaSR;		//VEC3
 		GLuint betaSM;		//VEC3
-	} ScatteringUniforms;
+	} ScatteringUniformPseudoConstants_ids;
+
+	typedef struct {
+		vmath::vec3 lightDir;	//VEC3
+		GLfloat lightSun;	//FLOAT
+
+		//GLuint density;		//FLOAT[][]
+
+		vmath::vec3 betaER;		//VEC3
+		vmath::vec3 betaEM;		//VEC3
+		vmath::vec3 betaSR;		//VEC3
+		vmath::vec3 betaSM;		//VEC3
+	} ScatteringUniformPseudoConstants_values;
+
+	typedef struct {
+		GLuint H_R;
+		GLuint H_M;
+		GLuint WORLD_RADIUS;
+		GLuint ATM_TOP_HEIGHT;
+		GLuint ATM_RADIUS;
+		GLuint ATM_RADIUS_2;
+		GLuint PI;
+		GLuint _3_16PI;
+		GLuint _3_8PI;
+		GLuint G;
+		GLuint G2;
+		GLuint P0;
+	} ScatteringUniformConstants_ids;
+
+	typedef struct {
+		GLfloat H_R;
+		GLfloat H_M;
+		GLfloat WORLD_RADIUS;
+		GLfloat ATM_TOP_HEIGHT;
+		GLfloat G;
+		GLfloat P0;
+	} ScatteringUniformConstants_values;
+
 private:
 	GLuint _renderProg;
 	CommonUniforms _commonUniforms;
-	ScatteringUniforms _scatteringUniforms;
+	ScatteringUniformPseudoConstants_ids _SUids;
+	ScatteringUniformConstants_ids _SUconst;
 public:
+	GLuint _tso[2];
 
 	void load(ShaderInfo* shaders) {
 		_renderProg = LoadShaders(shaders);
@@ -44,18 +85,32 @@ public:
 	void init() {
 		_commonUniforms.projectionMatrix = glGetUniformLocation(_renderProg, "projection_matrix");
 		_commonUniforms.modelMatrix = glGetUniformLocation(_renderProg, "model_matrix");
+		_commonUniforms.cam = glGetUniformLocation(_renderProg, "cam");
 
 
-		_scatteringUniforms.lightDir = glGetUniformLocation(_renderProg, "lightDir");
-		_scatteringUniforms.lightSun = glGetUniformLocation(_renderProg, "lightSun");
+		_SUids.lightDir = glGetUniformLocation(_renderProg, "lightDir");
+		_SUids.lightSun = glGetUniformLocation(_renderProg, "lightSun");
+		_SUids.betaER = glGetUniformLocation(_renderProg, "betaER");
+		_SUids.betaEM = glGetUniformLocation(_renderProg, "betaEM");
+		_SUids.betaSR = glGetUniformLocation(_renderProg, "betaSR");
+		_SUids.betaSM = glGetUniformLocation(_renderProg, "betaSM");
 
-		_scatteringUniforms.cam = glGetUniformLocation(_renderProg, "cam");
-		//_scatteringUniforms.density = glGetUniformLocation(_renderProg, "density");
 
-		_scatteringUniforms.betaER = glGetUniformLocation(_renderProg, "betaER");
-		_scatteringUniforms.betaEM = glGetUniformLocation(_renderProg, "betaEM");
-		_scatteringUniforms.betaSR = glGetUniformLocation(_renderProg, "betaSR");
-		_scatteringUniforms.betaSM = glGetUniformLocation(_renderProg, "betaSM");
+		_SUconst.H_R = glGetUniformLocation(_renderProg, "H_R");
+		_SUconst.H_M = glGetUniformLocation(_renderProg, "H_M");
+		_SUconst.WORLD_RADIUS = glGetUniformLocation(_renderProg, "WORLD_RADIUS");
+		_SUconst.ATM_TOP_HEIGHT = glGetUniformLocation(_renderProg, "ATM_TOP_HEIGHT");
+		_SUconst.ATM_RADIUS = glGetUniformLocation(_renderProg, "ATM_RADIUS");
+		_SUconst.ATM_RADIUS_2 = glGetUniformLocation(_renderProg, "ATM_RADIUS_2");
+		_SUconst.PI = glGetUniformLocation(_renderProg, "M_PI");
+		_SUconst._3_16PI = glGetUniformLocation(_renderProg, "_3_16PI");
+		_SUconst._3_8PI = glGetUniformLocation(_renderProg, "_3_8PI");
+		_SUconst.G = glGetUniformLocation(_renderProg, "G");
+		_SUconst.G2 = glGetUniformLocation(_renderProg, "G2");
+		_SUconst.P0 = glGetUniformLocation(_renderProg, "P0");
+
+		glGenTextures(2, _tso);
+
 	}
 
 	void use(){
@@ -74,27 +129,19 @@ public:
 	}
 
 	void modelMatrix(vmath::mat4 modelMat) {
-		glUniformMatrix4fv(_commonUniforms.modelMatrix , 1, GL_FALSE, modelMat);
+		glUniformMatrix4fv(_commonUniforms.modelMatrix, 1, GL_FALSE, modelMat);
 	}
 
 	void camera(vmath::vec3 cam) {
-		glUniform3fv(_scatteringUniforms.cam, 1, cam);
-		//glUniformMatrix4fv(_scatteringUniforms.density, 1, GL_FALSE, *density);
+		glUniform3fv(_commonUniforms.cam, 1, cam);
 	}
 
-	void scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER, 
-			vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM) {
-		//glUniformMatrix4fv(_scatteringUniforms.density, 1, GL_FALSE, *density);
+	void scatteringVariables(ScatteringUniformPseudoConstants_values scattValues);
 
-		glUniform3fv(_scatteringUniforms.lightDir, 1, lightDir);
-		glUniform1f(_scatteringUniforms.lightSun, lightSun);
+	void scatteringConstants(ScatteringUniformConstants_values scattValues);
 
-		glUniform3fv(_scatteringUniforms.betaER, 1, betaER);
-		glUniform3fv(_scatteringUniforms.betaEM, 1, betaEM);
-		glUniform3fv(_scatteringUniforms.betaSR, 1, betaSR);
-		glUniform3fv(_scatteringUniforms.betaSM, 1, betaSM);
-	}
-
+	void createHeightScatterMap(ScatteringUniformConstants_values scattValues,
+		SDL_Surface* &texR, SDL_Surface* &texM);
 };
 
 #endif

@@ -57,8 +57,8 @@ public:
 
 	// SETTERS
 	void modelMatrix(vmath::mat4 modelMatrix);
-	void scatteringVariables(vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER,
-		vmath::vec3 betaEM, vmath::vec3 betaSR, vmath::vec3 betaSM);
+	void scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues);
+	void scatteringConstants(Shader::ScatteringUniformConstants_values scattValues);
 
 	//ACTIONS
 	void initOGLData();
