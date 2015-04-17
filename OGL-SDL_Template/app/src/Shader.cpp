@@ -63,7 +63,7 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 
 	texR = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white.png");
 	texM = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white2.png");
-	/*
+	
 	GLfloat atmHeight = scattValues.ATM_TOP_HEIGHT;
 	GLfloat atmRadius = scattValues.WORLD_RADIUS + scattValues.ATM_TOP_HEIGHT;
 	GLfloat atmRadius2 = atmRadius * atmRadius;
@@ -129,5 +129,5 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 	for (int i = 0; i < 500; i+= 25) {
 		std::cout << pixR[(490 * texR->w) + i] << endl;
 	}
-	*/
+	
 }

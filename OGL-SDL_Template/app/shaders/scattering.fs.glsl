@@ -65,14 +65,6 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 	t2 = p2;
 
 	if(disc < 0.0f) return false;
-	/*
-	float q;
-	if ( b < 0.0f ) q = (-b - sqrt(disc)) / 2.0f;
-	else q = (-b + sqrt(disc)) / 2.0f;
-	
-	float d0 = q;
-	float d1 = c / q;
-	*/
 	
 	float d0 = (-b - sqrt(disc)) / 2.0f;
 	float d1 = (-b + sqrt(disc)) / 2.0f;
@@ -83,22 +75,11 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 		d1 = aux;
 	}
 	
-	if( d1 < 0.0f ) {
-		t1 = p1;
-		t2 = p2;
-		return false;	
-	}
+	if( d1 < 0.0f ) return false;
 
-	
-	if( d0 < 0.0f ) {
-		t1 = p1;
-	} else {
-		t1 = d0 * rayD + p1;
-	}
-	if(d1 > distance(p1, p2))
-		t2 = p2;
-	else
-		t2 = d1 * rayD + p1;
+	t1 = max(d0, 0.0f) * rayD + p1;
+	t2 = (d1 > distance(p1, p2)) ? p2 : d1 * rayD + p1;
+
 	return true;
 }
 /*
@@ -229,7 +210,7 @@ void main(void)
 
 			//vec2 dAP = density[h][cosPhi];
 			/******* TO TABLE ********/
-			/*
+			
 			vec2 densityCoord = vec2((h / ATM_TOP_HEIGHT), (cosPhi + 1.0f) / 2.0f);
 			//vec2 densityCoord = vec2((cosPhi + 1) / 2, (h / ATM_TOP_HEIGHT));
 			vec4 vDAP_Ray = texture(densityRayleigh, densityCoord);
@@ -327,8 +308,8 @@ void main(void)
 
 	//color = vs_fs_color;
 	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.xy).rgb * extintion;
-	//color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
-	color = q? vec4(exp(-diferential_s/10000), exp(-diferential_s/1000), exp(-diferential_s/10), 1) : vec4(0,0,1,1);
+	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
+	//color = q? vec4(exp(-diferential_s/10000), exp(-diferential_s/1000), exp(-diferential_s/10), 1) : vec4(0,0,1,1);
 	
 	//color = vec4(L0_Ext, 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);
