@@ -39,6 +39,7 @@ void ScatteringScene::initOGLData() {
 		7994.0f, //GLfloat H_R;
 		1200.0f, //GLfloat H_M;
 		6360000.0f,// * 10e6f, //GLfloat WORLD_RADIUS;
+		vmath::vec3(0.0f, -6360000.0f, 0.0f),//GLfloat C_EARTH;
 		80000.0f,// * 10e4f, //GLfloat ATM_TOP_HEIGHT;
 		0.76f, //GLfloat G;
 		1.0f //GLfloat P0;
@@ -51,8 +52,8 @@ void ScatteringScene::initOGLData() {
 	}
 
 	CheckErr();
-	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
-	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
 	_mountains->modelMatrix(vmath::translate(0.0f, 0.0f, 0.0f) * vmath::scale(MOUNTAINS_SCALE, MOUNTAINS_SCALE, MOUNTAINS_SCALE));
+	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
+	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
 
 }

@@ -50,6 +50,7 @@ public:
 		GLuint H_R;
 		GLuint H_M;
 		GLuint WORLD_RADIUS;
+		GLuint C_EARTH;
 		GLuint ATM_TOP_HEIGHT;
 		GLuint ATM_RADIUS;
 		GLuint ATM_RADIUS_2;
@@ -65,6 +66,7 @@ public:
 		GLfloat H_R;
 		GLfloat H_M;
 		GLfloat WORLD_RADIUS;
+		vmath::vec3 C_EARTH;
 		GLfloat ATM_TOP_HEIGHT;
 		GLfloat G;
 		GLfloat P0;
@@ -99,6 +101,7 @@ public:
 		_SUconst.H_R = glGetUniformLocation(_renderProg, "H_R");
 		_SUconst.H_M = glGetUniformLocation(_renderProg, "H_M");
 		_SUconst.WORLD_RADIUS = glGetUniformLocation(_renderProg, "WORLD_RADIUS");
+		_SUconst.C_EARTH = glGetUniformLocation(_renderProg, "C_EARTH");
 		_SUconst.ATM_TOP_HEIGHT = glGetUniformLocation(_renderProg, "ATM_TOP_HEIGHT");
 		_SUconst.ATM_RADIUS = glGetUniformLocation(_renderProg, "ATM_RADIUS");
 		_SUconst.ATM_RADIUS_2 = glGetUniformLocation(_renderProg, "ATM_RADIUS_2");

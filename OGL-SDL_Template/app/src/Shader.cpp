@@ -20,6 +20,7 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 	glUniform1f(_SUconst.H_R, scattValues.H_R);
 	glUniform1f(_SUconst.H_M, scattValues.H_M);
 	glUniform1f(_SUconst.WORLD_RADIUS, scattValues.WORLD_RADIUS);
+	glUniform3fv(_SUconst.C_EARTH, 1, scattValues.C_EARTH);
 	glUniform1f(_SUconst.ATM_TOP_HEIGHT, scattValues.ATM_TOP_HEIGHT);
 	GLfloat atmRad = scattValues.ATM_TOP_HEIGHT + scattValues.WORLD_RADIUS;
 	glUniform1f(_SUconst.ATM_RADIUS, atmRad);
@@ -62,13 +63,14 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 
 	texR = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white.png");
 	texM = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white2.png");
-
+	/*
 	GLfloat atmHeight = scattValues.ATM_TOP_HEIGHT;
 	GLfloat atmRadius = scattValues.WORLD_RADIUS + scattValues.ATM_TOP_HEIGHT;
 	GLfloat atmRadius2 = atmRadius * atmRadius;
 	GLfloat earthRadius = scattValues.WORLD_RADIUS;
 	GLfloat H_R = scattValues.H_R;
 	GLfloat H_M = scattValues.H_M;
+	GLfloat P0 = scattValues.P0;
 
 	GLfloat STEPS = 50.0f;
 
@@ -76,11 +78,6 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 	Uint32 *pixM = (Uint32 *)texM->pixels;
 
 	// Hay que generalizarlo
-	/**
-	* Idea: damos por supuesto point en la vertical de la tierra y calculamos
-	*		 normLightDir en funcion de cosPhi.
-	* Reducir el problema a dos dimensiones.
-	*/
 	GLuint accum = 0;
 	for (GLint w = 0; w < texR->w; w += 1) {
 		GLfloat initialHeight = ((atmRadius - earthRadius) * w) / texR->w;
@@ -88,7 +85,7 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 		vmath::vec2 point(0.0f, point_earth);
 
 		for (GLint h = 0; h < texR->h; h += 1) {
-			GLfloat cosPhi = (2.0f * h / texR->h) - 1.0f;
+			GLfloat cosPhi = (2.0f * h / (texR->h - 1)) - 1.0f;
 			GLfloat senPhi = sqrt(1.0f - cosPhi*cosPhi);
 
 			vmath::vec2 normLightDir(senPhi, -cosPhi);
@@ -107,22 +104,17 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 			for (GLfloat step = 0.5f; step < STEPS; step += 1.0f) {
 				GLfloat hPoint = vmath::distance(vmath::vec2(0.0f, 0.0f), point + delta_A * step) - earthRadius;
 				
-				//if (hPoint >= 0) {
 					GLfloat relation[2] = { -hPoint / H_R, -hPoint / H_M };
-					density_AP[0] += exp(relation[0]) * diferential_A / 1000;
-					density_AP[1] += exp(relation[1]) * diferential_A / 1000;
-				/*} else {
-					density_AP[0] += diferential_A;
-					density_AP[1] += diferential_A;
-				}/*/
-
-				//density_AP[0] += 1.0f * ((h * texR->w) + w);
-				//density_AP[1] += 1.0f * ((h * texR->w) + w);//*/
+					density_AP[0] += P0 * exp(relation[0]) * diferential_A;
+					density_AP[1] += P0 * exp(relation[1]) * diferential_A;
+				
 			}
 			pixR[(h * texR->w) + w] = (Uint32)density_AP[0];
 			pixM[(h * texR->w) + w] = (Uint32)density_AP[1];
 		}
 	}
+
+
 	Uint32 myuint = pixR[(490 * texR->w) + 6];
 	float r, g, b, a;
 	r = (myuint % 255) / 255.f;
@@ -132,6 +124,10 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 	vmath::vec4 abgr(a, b, g, r);
 	vmath::vec4 vec(256 * 256 * 256, 256 * 256, 256, 1);
 	float pepe = vmath::dot(abgr, vec) * 255;
-	std::cout << myuint << " :::: " << pepe;
+	std::cout << myuint << " :::: " << pepe << endl;
 
+	for (int i = 0; i < 500; i+= 25) {
+		std::cout << pixR[(490 * texR->w) + i] << endl;
+	}
+	*/
 }

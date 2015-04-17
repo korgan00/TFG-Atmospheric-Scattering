@@ -58,7 +58,7 @@ void Engine::SetupOpenGL() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	_ctxt = SDL_GL_CreateContext(_window);
 
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval(1);
 
 	if (gl3wInit()) {
 		std::cout << "Error al Inicializar GL3W" << std::endl;
@@ -103,11 +103,15 @@ void Engine::InitData() {
 	_scene.initOGLData();
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+	glClearDepth(1.0f);
 
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
+	glDepthFunc(GL_LEQUAL);
+	/*
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	*/
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 }
 
