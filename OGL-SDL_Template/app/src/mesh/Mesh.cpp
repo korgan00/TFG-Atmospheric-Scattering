@@ -140,7 +140,7 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	_shader.camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
 	CheckErr();
 
-	glActiveTexture(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, _shader._tso[0]);
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, _shader._tso[1]);

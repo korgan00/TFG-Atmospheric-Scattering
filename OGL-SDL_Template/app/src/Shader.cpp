@@ -1,6 +1,40 @@
 #include "Shader.h"
 
+void Shader::init() {
+	_commonUniforms.projectionMatrix = glGetUniformLocation(_renderProg, "projection_matrix");
+	_commonUniforms.modelMatrix = glGetUniformLocation(_renderProg, "model_matrix");
+	_commonUniforms.cam = glGetUniformLocation(_renderProg, "cam");
 
+
+	_SUids.lightDir = glGetUniformLocation(_renderProg, "lightDir");
+	_SUids.lightSun = glGetUniformLocation(_renderProg, "lightSun");
+	_SUids.betaER = glGetUniformLocation(_renderProg, "betaER");
+	_SUids.betaEM = glGetUniformLocation(_renderProg, "betaEM");
+	_SUids.betaSR = glGetUniformLocation(_renderProg, "betaSR");
+	_SUids.betaSM = glGetUniformLocation(_renderProg, "betaSM");
+
+
+	_SUconst.H_R = glGetUniformLocation(_renderProg, "H_R");
+	_SUconst.H_M = glGetUniformLocation(_renderProg, "H_M");
+	_SUconst.WORLD_RADIUS = glGetUniformLocation(_renderProg, "WORLD_RADIUS");
+	_SUconst.C_EARTH = glGetUniformLocation(_renderProg, "C_EARTH");
+	_SUconst.ATM_TOP_HEIGHT = glGetUniformLocation(_renderProg, "ATM_TOP_HEIGHT");
+	_SUconst.ATM_RADIUS = glGetUniformLocation(_renderProg, "ATM_RADIUS");
+	_SUconst.ATM_RADIUS_2 = glGetUniformLocation(_renderProg, "ATM_RADIUS_2");
+	_SUconst.PI = glGetUniformLocation(_renderProg, "M_PI");
+	_SUconst._3_16PI = glGetUniformLocation(_renderProg, "_3_16PI");
+	_SUconst._3_8PI = glGetUniformLocation(_renderProg, "_3_8PI");
+	_SUconst.G = glGetUniformLocation(_renderProg, "G");
+	_SUconst.G2 = glGetUniformLocation(_renderProg, "G2");
+	_SUconst.P0 = glGetUniformLocation(_renderProg, "P0");
+
+
+	_SUconst.densityRayleigh = glGetUniformLocation(_renderProg, "densityRayleigh");
+	_SUconst.densityMie = glGetUniformLocation(_renderProg, "densityMie");
+
+	glGenTextures(2, _tso);
+
+}
 
 void Shader::scatteringVariables(ScatteringUniformPseudoConstants_values scattValues) {
 	/*vmath::vec3 lightDir, GLfloat lightSun, vmath::vec3 betaER,
@@ -31,17 +65,27 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 	glUniform1f(_SUconst.G, scattValues.G);
 	glUniform1f(_SUconst.G2, scattValues.G * scattValues.G);
 	glUniform1f(_SUconst.P0, scattValues.P0);
+
+	//cout << _SUconst.densityRayleigh << endl;
+	//cout << _SUconst.densityMie << endl;
+
+	glUniform1i(_SUconst.densityRayleigh, 6);
+	glUniform1i(_SUconst.densityMie, 5);
 	CheckErr();
 
 
 	SDL_Surface *texR = nullptr, *texM = nullptr;
 	createHeightScatterMap(scattValues, texR, texM);
 
-	glActiveTexture(GL_TEXTURE4);
+	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, _tso[0]);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texR->w, texR->h, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, texR->pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	CheckErr();
 
@@ -52,6 +96,10 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texM->w, texM->h, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, texM->pixels);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
 	CheckErr();
 
 	//IMG_SavePNG(texM, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapMie.png");

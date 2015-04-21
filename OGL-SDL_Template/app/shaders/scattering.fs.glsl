@@ -82,73 +82,7 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 
 	return true;
 }
-/*
-float intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, float atmRadius_2) {
-	t1 = p1;
-	t2 = p2;
-	vec3 t3, t4;
 
-	vec3 vectorP1P2 = p2 - p1;
-	vec3 normP1P2 = normalize(vectorP1P2);
-	float lenP1P2 = length(vectorP1P2);
-	
-    vec3 vectorCP = p1 - cEarth;
-
-    float a = 1.0f;//dot(vectorP1P2, vectorP1P2); // dot
-    float b = 2.0f * dot(vectorCP, vectorP1P2);
-    float c = dot(vectorCP, vectorCP) - atmRadius_2;
- 
-    float delta = b*b - 4.0f*a*c;
-	
-	float threshold = 0.0001f;
-    if (delta < threshold) return 0.0;
-
-	float d1;
-	float d2;
-	//if(b < 0.0f) {
-		d1 = (-b - sqrt(delta)) / (2.0f * a);
-		d2 = (-b + sqrt(delta)) / (2.0f * a);
-	//} else {
-		//d2 = (-b - sqrt(delta)) / (2.0f * a);
-		//d1 = (-b + sqrt(delta)) / (2.0f * a);
-	//}
-
-	vec3 m1 = p1;
-	vec3 m2 = p2;
-	vec3 m3 = p1 + normP1P2 * d1;
-	vec3 m4 = p1 + normP1P2 * d2;
-
-	
-	float l1_2 = lenP1P2;
-	float l1_3 = length(m3 - m1) * dot(normalize(m2 - m1), normalize(m3 - m1));
-	float l1_4 = length(m4 - m1);
-	
-	t1 = m1;
-
-	if ( l1_3 < 0.0f ) {
-		t1 = m3;
-	}
-
-	t2 = m2;
-
-	if ( l1_4 > l1_2 ) {
-		t2 = m4;
-	}
-
-
-	
-	return d1;
-	d1 = max(d1, 0.0f);
-	d2 = max(d2, 0.0f);
-	//d1 = auxd1;
-	//d2 = auxd2;
-	
-	t1 = p1 + vectorP1P2 * d1;
-	t2 = p1 + vectorP1P2 * min(d2, lenP1P2);
-        
-	//return d2 != 0.0f;
-}
-*/
 void main(void)
 {
 	vec4 transfVec = vec4(256.0f * 256.0f * 256.0f, 256.0f * 256.0f, 256.0f, 1.0f) * 255.0f;
@@ -220,49 +154,6 @@ void main(void)
 
 			vec2 density_AP = vec2(fDAP_Ray, fDAP_Mie);
 			
-			// CALCULAR PUNTO DE LA ATMOSFERA!!
-			/*/
-			vec2 density_AP = vec2(0.0f, 0.0f);
-			float comp_cosPhi = -cosPhi;
-			float point_earth = length(point - cEarth);
-			float b = 2 * point_earth * comp_cosPhi;
-			float c = point_earth * point_earth - ATM_RADIUS_2;
-			float sqrtBody = b*b - 4 * c;
-			float a1 = (b + sqrt(sqrtBody)) / 2;
-			float a2 = (b - sqrt(sqrtBody)) / 2;
-
-			//vec3 A1 = -normLightDir * a1 + point;
-			//vec3 A2 = -normLightDir * a2 + point;
-			
-			//vec3 A1A2 = normalize(A2 - A1);
-			//vec3 A2A1 = normalize(A1 - A2);
-			//float a1a2 = length(A1A2 - normLightDir);
-			//float a2a1 = length(A2A1 - normLightDir);
-			//vec3 A = a1a2 < a2a1 ? A1 : A2;
-			vec3 A = -normLightDir * max(a1, a2) + point;
-
-			vec3 delta_A = (point - A) / N_STEPS;
-			float diferential_h = length(delta_A);
-
-			for (float step = 0.5f; step < N_STEPS; step += 1.0f) {
-				float hPoint = (length((A + delta_A * step) - cEarth) - WORLD_RADIUS);
-				density_AP += exp( -hPoint / vec2(H_R, H_M)) * diferential_h;
-			}/*/
-			/*
-			vec3 delta_A = (A - point) / N_STEPS;
-			float diferential_h = length(delta_A);
-
-			for (float step = 0.5f; step < N_STEPS; step += 1.0f) {
-				float hPoint = (length((point + delta_A * step) - cEarth) - WORLD_RADIUS);
-				density_AP += exp(-hPoint / vec2(H_R, H_M)) * diferential_h;
-			}//*/
-
-			//density_AP = vec2(90000, 12000);
-			//density_AP = vec2(10000, 10000);
-			//density_AP = vec2(1000, 1000);
-			//density_AP = vec2(1000, 1000);
-
-			//vec2 dAP = vec2(0.5f, 0.5f);
 
 			density_PC += partDenRM * diferential_s;
 
@@ -307,11 +198,12 @@ void main(void)
 	vec3 extintion = exp(-(density_PC.x * betaER + density_PC.y * betaEM));
 
 	//color = vs_fs_color;
-	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.xy).rgb * extintion;
+	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.st).rgb * extintion;
 	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
 	//color = q? vec4(exp(-diferential_s/10000), exp(-diferential_s/1000), exp(-diferential_s/10), 1) : vec4(0,0,1,1);
 	
 	//color = vec4(L0_Ext, 1);
+	//color = vec4(texture(densityRayleigh, vs_fs_color.st).rgb, 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);
 	//color = vec4(inScattering, 1);
 	//color = vec4(phase_mieScattering, phase_mieScattering, phase_mieScattering, 1);
