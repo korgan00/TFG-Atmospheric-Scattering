@@ -111,7 +111,7 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 	//IMG_SavePNG(texR, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapRay.png");
 }
 
-
+/*
 void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValues, SDL_Surface* &texR, SDL_Surface* &texM) {
 
 	texR = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white.png");
@@ -168,21 +168,99 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 			pixM[(h * texR->w) + w] = (Uint32)density_AP[1];
 		}
 	}
+}
 
-	/*
-	Uint32 myuint = pixR[(180 * texR->w) + 6];
-	float r, g, b, a;
-	r = (myuint % 255) / 255.f;
-	g = ((myuint >> 8) % 255) / 255.f;
-	b = ((myuint >> 16) % 255) / 255.f;
-	a = ((myuint >> 24) % 255) / 255.f;
-	vmath::vec4 abgr(a, b, g, r);
-	vmath::vec4 vec(256 * 256 * 256, 256 * 256, 256, 1);
-	float pepe = vmath::dot(abgr, vec) * 255;
-	std::cout << myuint << " :::: " << pepe << endl;
+*/
 
-	for (int i = 0; i < 500; i+= 25) {
-		std::cout << pixR[(180 * texR->w) + i] << endl;
+void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValues, SDL_Surface* &texR, SDL_Surface* &texM) {
+
+	texR = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white.png");
+	texM = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white2.png");
+
+	GLfloat atmHeight = scattValues.ATM_TOP_HEIGHT;
+	GLfloat atmRadius = scattValues.WORLD_RADIUS + scattValues.ATM_TOP_HEIGHT;
+	GLfloat atmRadius2 = atmRadius * atmRadius;
+	GLfloat earthRadius = scattValues.WORLD_RADIUS;
+	GLfloat H_R = scattValues.H_R;
+	GLfloat H_M = scattValues.H_M;
+	GLfloat P0 = scattValues.P0;
+
+	GLfloat STEPS = 50.0f;
+
+	Uint32 *pixR = (Uint32 *)texR->pixels;
+	Uint32 *pixM = (Uint32 *)texM->pixels;
+
+	for (GLint w = 0; w < texR->w; w += 1) {
+		GLfloat initialHeight = ((atmRadius - earthRadius) * w) / texR->w;
+		//float point_earth = length(point - cEarth);
+		GLfloat point_earth = initialHeight + earthRadius;
+		vmath::vec3 point(0.0f, point_earth, 0.0f);
+
+		for (GLint h = 0; h < texR->h; h += 1) {
+			//vec2 density_AP = vec2(0.0f, 0.0f);
+			GLfloat density_AP[2] = { 0.0, 0.0 };
+
+			//float comp_cosPhi = -cosPhi;
+			GLfloat cosPhi = (2.0f * h / (texR->h - 1)) - 1.0f;
+			GLfloat senPhi = sqrt(1.0f - cosPhi*cosPhi);
+			vmath::vec3 normLightDir(senPhi, -cosPhi, 0.0f);
+
+			vmath::vec3 t1, t2;
+			bool intersects = intersection(point, point + (-normLightDir * 15000000.0f),
+				t1, t2, vmath::vec3(0.0f, 0.0f, 0.0f), atmRadius2);
+
+			if (!intersects) {
+				stringstream ss("NOT INTERSECTING: ");
+				ss << "h:" << initialHeight << " ; cosPhi: " << cosPhi;
+				Log::warning(ss.str());
+			}
+
+			//vec3 A = -normLightDir * max(a1, a2) + point;
+			GLfloat diferential_A = vmath::distance(t1, t2) / STEPS;
+			vmath::vec3 delta_A(-normLightDir * diferential_A);
+
+			for (GLfloat step = 0.5f; step < STEPS; step += 1.0f) {
+				GLfloat hPoint = vmath::length(point + delta_A * step) - earthRadius;
+
+				GLfloat relation[2] = { -hPoint / H_R, -hPoint / H_M };
+				density_AP[0] += P0 * exp(relation[0]) * diferential_A;
+				density_AP[1] += P0 * exp(relation[1]) * diferential_A;
+			}
+
+			pixR[(h * texR->w) + w] = (Uint32)density_AP[0];
+			pixM[(h * texR->w) + w] = (Uint32)density_AP[1];
+		}
 	}
-	//*/
+}
+
+
+
+bool Shader::intersection(vmath::vec3 p1, vmath::vec3 p2, vmath::vec3 &t1, vmath::vec3 &t2, vmath::vec3 cEarth, float atmRadius_2) {
+	vmath::vec3 rayD = vmath::normalize(p2 - p1);
+	vmath::vec3 oc = p1 - cEarth;
+
+	float b = 2.0f * vmath::dot(rayD, oc);
+	float c = vmath::dot(oc, oc) - atmRadius_2;
+	float disc = b*b - 4.0f*c;
+
+	t1 = p1;
+	t2 = p2;
+
+	if (disc < 0.0f) return false;
+
+	float d0 = (-b - sqrtf(disc)) / 2.0f;
+	float d1 = (-b + sqrtf(disc)) / 2.0f;
+
+	if (d0 > d1) {
+		float aux = d0;
+		d0 = d1;
+		d1 = aux;
+	}
+
+	if (d1 < 0.0f) return false;
+
+	t1 = fmax(d0, 0.0f) * rayD + p1;
+	t2 = (d1 > vmath::distance(p1, p2)) ? p2 : d1 * rayD + p1;
+
+	return true;
 }

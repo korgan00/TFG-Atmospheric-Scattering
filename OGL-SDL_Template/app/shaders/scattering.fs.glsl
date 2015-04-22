@@ -140,7 +140,7 @@ void main(void)
 		vec3 difLM = partDenRM.y * betaSM * extinction_RM * diferential_s;
 
 		// Calcular visibilidad de P
-		float visi = cosPhi < -0.25f ? 1.0f : 1.0f;
+		float visi = cosPhi < -0.24f ? 0.0f : 1.0f;
 
 		rayLeigh_In += difLR * visi;
 		mie_In += difLM * visi;

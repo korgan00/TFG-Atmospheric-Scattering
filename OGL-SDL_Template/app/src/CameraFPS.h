@@ -69,7 +69,7 @@ public:
 	
 	inline void rotate(Axis axis, GLfloat angle) {
 		if (axis == Y) _yRotation +=angle;
-		else if (axis == X) _xRotation = fmax(fmin(_xRotation + angle, 90.0f), -90.0f);
+		else if (axis == X) _xRotation += angle;// fmax(fmin(_xRotation + angle, 90.0f), -90.0f);
 		_updateRotation = true;
 	}
 	inline void rotate(Axis axis, Way way) { _rotating[axis] = (float)way; }

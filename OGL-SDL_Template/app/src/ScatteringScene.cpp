@@ -30,13 +30,13 @@ void ScatteringScene::initOGLData() {
 
 	Shader::ScatteringUniformPseudoConstants_values spcValues;
 
-	spcValues.lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
+	spcValues.lightDir = vmath::vec3(0.0f, 0.3f, 1.0f);
 	spcValues.lightSun = 50.0f;
 
 	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
 	spcValues.betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f;
-	spcValues.betaER = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
-	spcValues.betaEM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f * 1.1f;
+	spcValues.betaER = spcValues.betaSR;
+	spcValues.betaEM = spcValues.betaSM * 1.1f;
 
 	Shader::ScatteringUniformConstants_values scValues;
 

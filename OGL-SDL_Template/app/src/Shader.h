@@ -119,6 +119,9 @@ public:
 
 	void createHeightScatterMap(ScatteringUniformConstants_values scattValues,
 		SDL_Surface* &texR, SDL_Surface* &texM);
+
+	bool intersection(vmath::vec3 p1, vmath::vec3 p2, vmath::vec3 &t1, vmath::vec3 &t2, vmath::vec3 cEarth, float atmRadius_2);
+
 };
 
 #endif
