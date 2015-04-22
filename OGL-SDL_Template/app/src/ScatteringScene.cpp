@@ -3,8 +3,8 @@
 
 const GLfloat ScatteringScene::EARTH_RADIUS = 6360000.0f;
 const GLfloat ScatteringScene::ATM_TOP_HEIGHT = 80000.0f;
-const GLfloat ScatteringScene::DEEP_SPACE_RADIUS = EARTH_RADIUS * 1.2f;
-const GLfloat ScatteringScene::MOUNTAINS_SCALE = 20.0f;
+const GLfloat ScatteringScene::DEEP_SPACE_RADIUS = EARTH_RADIUS * 1.4f;
+const GLfloat ScatteringScene::MOUNTAINS_SCALE = 10.0f;
 
 const GLfloat ScatteringScene::PARTICLE_SCALE_HEIGHT_RAYLEIGH = 7994.0f;
 const GLfloat ScatteringScene::PARTICLE_SCALE_HEIGHT_MIE = 1200.0f;
@@ -13,7 +13,8 @@ void ScatteringScene::initOGLData() {
 
 	ObjLoader::ObjFileInfo* mountainsObj = ObjLoader::load("Arid.obj");
 	_mountains = ObjToMesh::convert(mountainsObj, new MountainTextureFactory());
-	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("sphere.obj");
+	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("sphere2.obj"); /*/ // Massive poligon
+	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("sphere.obj"); // light*/
 	_blueSphere = ObjToMesh::convert(sphereObj);
 	ObjLoader::ObjFileInfo* spaceObj = ObjLoader::load("deepSpace.obj");
 	_deepSpace = ObjToMesh::convert(spaceObj);
@@ -27,23 +28,26 @@ void ScatteringScene::initOGLData() {
 
 	CheckErr();
 
-	Shader::ScatteringUniformPseudoConstants_values spcValues = {
-		vmath::vec3(0.0f, -1.0f, 0.1f), // LIGHT_DIR
-		20.0f, // LIGHT_SUN
-		vmath::vec3(5.8f, 13.5f, 33.1f) * 10e-6f, // betaSR
-		vmath::vec3(2.0f, 2.0f, 2.0f) * 10e-5f, // betaSM
-		vmath::vec3(5.8f, 13.5f, 33.1f) * 10e-6f, // betaER
-		vmath::vec3(2.0f, 2.0f, 2.0f) * 10e-5f * 1.1f, // betaEM
-	};
-	Shader::ScatteringUniformConstants_values scValues = {
-		7994.0f, //GLfloat H_R;
-		1200.0f, //GLfloat H_M;
-		6360000.0f,// * 10e6f, //GLfloat WORLD_RADIUS;
-		vmath::vec3(0.0f, -6360000.0f, 0.0f),//GLfloat C_EARTH;
-		80000.0f,// * 10e4f, //GLfloat ATM_TOP_HEIGHT;
-		0.76f, //GLfloat G;
-		1.0f //GLfloat P0;
-	};
+	Shader::ScatteringUniformPseudoConstants_values spcValues;
+
+	spcValues.lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
+	spcValues.lightSun = 50.0f;
+
+	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
+	spcValues.betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f;
+	spcValues.betaER = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
+	spcValues.betaEM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f * 1.1f;
+
+	Shader::ScatteringUniformConstants_values scValues;
+
+	scValues.H_R = 7994.0f;
+	scValues.H_M = 1200.0f;
+	scValues.WORLD_RADIUS = 6360000.0f;
+	scValues.C_EARTH = vmath::vec3(0.0f, -scValues.WORLD_RADIUS, 0.0f);
+	scValues.ATM_TOP_HEIGHT = 80000.0f;
+	scValues.G = 0.76f;
+	scValues.P0 = 1.0f;
+
 
 	CheckErr();
 	for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
@@ -52,8 +56,11 @@ void ScatteringScene::initOGLData() {
 	}
 
 	CheckErr();
-	_mountains->modelMatrix(vmath::translate(0.0f, 0.0f, 0.0f) * vmath::scale(MOUNTAINS_SCALE, MOUNTAINS_SCALE, MOUNTAINS_SCALE));
-	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
-	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
+	_mountains->modelMatrix(vmath::translate(0.0f, 0.0f, 0.0f) * 
+							vmath::scale(MOUNTAINS_SCALE, MOUNTAINS_SCALE, MOUNTAINS_SCALE));
+	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * 
+							 vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
+	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * 
+							vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
 
 }

@@ -4,7 +4,7 @@
 const GLfloat CameraFPS::MOVMENT = 0.05f;
 const GLfloat CameraFPS::ROTATION = 0.15f;
 const GLfloat CameraFPS::MOUSE_ROTATION = 180.0f;
-const GLfloat CameraFPS::RENDER_DISTANCE = 14000000.0f;
+const GLfloat CameraFPS::RENDER_DISTANCE = 30000000.0f;
 
 CameraFPS::CameraFPS(SDL_Window* w) :
 		_captureMouse(false), _wrapping(false), _window(w), _velocity(0, 0, 0),
@@ -15,7 +15,7 @@ CameraFPS::CameraFPS(SDL_Window* w) :
 	int winWidth, winHeight;
 	SDL_GetWindowSize(_window, &winWidth, &winHeight);
 	GLfloat aspect = float(DEFAULT_WIN_HEIGHT) / float(DEFAULT_WIN_WIDTH);
-	_currentMatrix = vmath::mat4(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, 2000.0f)) * vmath::translate(0.0f, 100.0f, 0.0f);
+	_currentMatrix = vmath::mat4(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, RENDER_DISTANCE));
 }
 
 void CameraFPS::Event(SDL_Event* event) {

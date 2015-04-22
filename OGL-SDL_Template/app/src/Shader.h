@@ -79,6 +79,8 @@ private:
 	CommonUniforms _commonUniforms;
 	ScatteringUniformPseudoConstants_ids _SUids;
 	ScatteringUniformConstants_ids _SUconst;
+
+	static SDL_Surface *texDensityRay, *texDensityMie;
 public:
 	GLuint _tso[2];
 

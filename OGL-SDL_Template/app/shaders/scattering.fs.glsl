@@ -90,35 +90,18 @@ void main(void)
 
 	float _3_16PI = 3.0f / (16.0f * M_PI);
 	float _3_8PI = 3.0f / (8.0f * M_PI);
-	//float atm_Radius = ATM_RADIUS;
-	//float atm_Radius_2 = ATM_RADIUS * ATM_RADIUS;
 	vec3 cEarth = C_EARTH;
 
 	// Calculo view
 	mat4 projTrans = transpose(projection_matrix);
 	vec3 view = normalize(projTrans[2].xyz);
 	vec3 normLightDir = normalize(lightDir);
-
-	//float obj_cEarth = length(obj - cEarth);
 	
 	vec3 computedCam;
 	vec3 obj2;
 
-	
-	// NEW CODE
 	bool q = intersection(cam, obj, computedCam, obj2, cEarth, ATM_RADIUS_2);
-	vec3 delta_P = (obj2 - computedCam) / N_STEPS;/*/
-	// OLD CODE
-	bool q = true;
-	if (length(obj-cEarth) < ATM_RADIUS) { // malisima aproximacion.
-		// hay que sacar el punto de corte Obj_Cam con atmosfera y computar desde ahi
-		// por esto la tierra salia blanca excepto con el punto mas cercano a nosotros.
-		computedCam = normalize(cam - cEarth) * min(ATM_RADIUS, length(cam - cEarth)) + cEarth;
-	} else {
-		computedCam = cam;
-	}
-	vec3 delta_P = (obj - computedCam) / N_STEPS;
-	//*/
+	vec3 delta_P = (obj2 - computedCam) / N_STEPS;
 
 	float diferential_s = length(delta_P);
 	
@@ -132,56 +115,38 @@ void main(void)
 
 		float h = length(point - cEarth) - WORLD_RADIUS;
 
-		//if (h < ATM_TOP_HEIGHT) {
+		vec3 normalEarth = normalize(point - cEarth);
 
-			//vec3 normalEarth = point - cEarth / length(point - cEarth);
-			vec3 normalEarth = normalize(point - cEarth);
+		vec2 partDenRM = P0 * exp(-h / vec2(H_R, H_M));
 
-			vec2 partDenRM = P0 * exp(-h / vec2(H_R, H_M));
-
-			//float cosPhi = dot(-normLightDir, normalEarth) / length(normalEarth);
-			float cosPhi = dot(normalEarth, -normLightDir);//    / length(normLightDir);
-
-			//vec2 dAP = density[h][cosPhi];
-			/******* TO TABLE ********/
+		float cosPhi = dot(normalEarth, -normLightDir);
 			
-			vec2 densityCoord = vec2((h / ATM_TOP_HEIGHT), (cosPhi + 1.0f) / 2.0f);
-			//vec2 densityCoord = vec2((cosPhi + 1) / 2, (h / ATM_TOP_HEIGHT));
-			vec4 vDAP_Ray = texture(densityRayleigh, densityCoord);
-			vec4 vDAP_Mie = texture(densityMie, densityCoord);
-			float fDAP_Ray = dot(transfVec, vDAP_Ray.abgr);
-			float fDAP_Mie = dot(transfVec, vDAP_Mie.abgr);
-
-			vec2 density_AP = vec2(fDAP_Ray, fDAP_Mie);
+		vec2 densityCoord = vec2((h / ATM_TOP_HEIGHT), (cosPhi + 1.0f) / 2.0f);
+		vec4 vDAP_Ray = texture(densityRayleigh, densityCoord);
+		vec4 vDAP_Mie = texture(densityMie, densityCoord);
+		float fDAP_Ray = dot(transfVec, vDAP_Ray.abgr);
+		float fDAP_Mie = dot(transfVec, vDAP_Mie.abgr);
+			
+		vec2 density_AP = vec2(fDAP_Ray, fDAP_Mie);
 			
 
-			density_PC += partDenRM * diferential_s;
+		density_PC += partDenRM * diferential_s;
 
-			vec2 density_APC = density_AP + density_PC;
+		vec2 density_APC = density_AP + density_PC;
 
-			//vec3 tR = density_APC.x * betaER;
-			//vec3 tM = density_APC.y * betaEM;
+		vec3 extinction_RM = exp(-( density_APC.x * betaER + density_APC.y * betaEM ));
 
-			//vec3 opticalDepthRM = density_APC.x * betaER + density_APC.y * betaEM;
-			vec3 extinction_RM = exp(-( density_APC.x * betaER + density_APC.y * betaEM ));
+		vec3 difLR = partDenRM.x * betaSR * extinction_RM * diferential_s;
+		vec3 difLM = partDenRM.y * betaSM * extinction_RM * diferential_s;
 
-			vec3 difLR = partDenRM.x * betaSR * extinction_RM * diferential_s;
-			vec3 difLM = partDenRM.y * betaSM * extinction_RM * diferential_s;
+		// Calcular visibilidad de P
+		float visi = cosPhi < -0.25f ? 1.0f : 1.0f;
 
-			// Calcular visibilidad de P
-
-			float visi = 1.0f;
-
-			rayLeigh_In += difLR * visi;
-			mie_In += difLM * visi;
-		//}
+		rayLeigh_In += difLR * visi;
+		mie_In += difLM * visi;
 	}
 
-	//float cosTheta = cos(lightDir + view);
-	//float cos2ThetaP1 = 1 + (cosTheta * cosTheta);
-
-	//float cosTheta = dot(normLightDir, -view) / length(view);
-	float cosTheta = dot(normalize(-view), normLightDir);//    / length(normLightDir);
+	float cosTheta = dot(normalize(-view), normLightDir);
 
 	float cos2ThetaP1 = 1.0f + (cosTheta * cosTheta);
 

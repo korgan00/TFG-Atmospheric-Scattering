@@ -1,5 +1,9 @@
 #include "Shader.h"
 
+SDL_Surface* Shader::texDensityRay = nullptr;
+SDL_Surface* Shader::texDensityMie = nullptr;
+
+
 void Shader::init() {
 	_commonUniforms.projectionMatrix = glGetUniformLocation(_renderProg, "projection_matrix");
 	_commonUniforms.modelMatrix = glGetUniformLocation(_renderProg, "model_matrix");
@@ -74,14 +78,15 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 	CheckErr();
 
 
-	SDL_Surface *texR = nullptr, *texM = nullptr;
-	createHeightScatterMap(scattValues, texR, texM);
+	if (texDensityRay == nullptr || texDensityMie == nullptr) {
+		createHeightScatterMap(scattValues, texDensityRay, texDensityMie);
+	}
 
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, _tso[0]);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texR->w, texR->h, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, texR->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texDensityRay->w, texDensityRay->h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, texDensityRay->pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -94,8 +99,8 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, _tso[1]);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texM->w, texM->h, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, texM->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texDensityMie->w, texDensityMie->h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, texDensityMie->pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -149,21 +154,23 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 
 			GLfloat density_AP[2] = { 0.0, 0.0 };
 			accum++;
+
 			for (GLfloat step = 0.5f; step < STEPS; step += 1.0f) {
 				GLfloat hPoint = vmath::distance(vmath::vec2(0.0f, 0.0f), point + delta_A * step) - earthRadius;
 				
-					GLfloat relation[2] = { -hPoint / H_R, -hPoint / H_M };
-					density_AP[0] += P0 * exp(relation[0]) * diferential_A;
-					density_AP[1] += P0 * exp(relation[1]) * diferential_A;
+				GLfloat relation[2] = { -hPoint / H_R, -hPoint / H_M };
+				density_AP[0] += P0 * exp(relation[0]) * diferential_A;
+				density_AP[1] += P0 * exp(relation[1]) * diferential_A;
 				
 			}
+
 			pixR[(h * texR->w) + w] = (Uint32)density_AP[0];
 			pixM[(h * texR->w) + w] = (Uint32)density_AP[1];
 		}
 	}
 
-
-	Uint32 myuint = pixR[(490 * texR->w) + 6];
+	/*
+	Uint32 myuint = pixR[(180 * texR->w) + 6];
 	float r, g, b, a;
 	r = (myuint % 255) / 255.f;
 	g = ((myuint >> 8) % 255) / 255.f;
@@ -175,7 +182,7 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 	std::cout << myuint << " :::: " << pepe << endl;
 
 	for (int i = 0; i < 500; i+= 25) {
-		std::cout << pixR[(490 * texR->w) + i] << endl;
+		std::cout << pixR[(180 * texR->w) + i] << endl;
 	}
-	
+	//*/
 }
