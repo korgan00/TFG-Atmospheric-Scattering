@@ -38,20 +38,6 @@ in vec4 vs_fs_color;
 in vec3 obj;
 
 layout (location = 0) out vec4 color;
-/*
-#define N_STEPS 20.0f
-#define H_R 7994.0f
-#define H_M 1200.0f
-#define WORLD_RADIUS 6360000.0f
-#define ATM_TOP_HEIGHT 80000.0f
-#define ATM_RADIUS WORLD_RADIUS + ATM_TOP_HEIGHT
-//#define H_R 79.0f
-//#define H_M 10.0f
-#define M_PI 3.1415926535897932384626433832795
-#define G 0.76
-#define G2 (G*G)
-#define P0 1
-*/
 
 bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, float atmRadius_2) {
 	vec3 rayD = normalize(p2 - p1);
