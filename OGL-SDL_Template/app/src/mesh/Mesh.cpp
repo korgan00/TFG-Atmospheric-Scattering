@@ -2,7 +2,6 @@
 #include "Mesh.h"
 
 
-//Mesh::Mesh() : _vertexCount(0), _texCoordCount(0), _facesCount(0) {}
 
 void Mesh::initOGLData() {
 
@@ -38,6 +37,7 @@ void Mesh::initOGLData() {
 		}
 		CheckErr();
 	}
+
 	// Pedimos un array de vertices
 	glGenVertexArrays(1, _vao);
 	// Le hacemos hueco
@@ -50,9 +50,6 @@ void Mesh::initOGLData() {
 	_vboDataSize = _vboDataCount * sizeof(PerVertex);
 	// Le decimos que el hueco tiene que ser de tamaño "tamaño de cube positions"+"tamaño de cube colors"
 	glBufferData(GL_ARRAY_BUFFER, _vboDataSize, _vertexBufferObjectData, GL_STATIC_DRAW);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, _vboDataSize, _vertexBufferObjectData);
-	//glBufferSubData(GL_ARRAY_BUFFER, _sizeOfVertex, _sizeOfTexCoords, _texCoord);
-	//GLint vertexInfoAttrib = glGetAttribLocation(, "vertexInfo");
 
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PerVertex), 0);
@@ -68,28 +65,6 @@ void Mesh::initOGLData() {
 	Log::trace("InitOGL Data check...");
 	CheckErr();
 	Log::trace("CHECKED!");
-
-	//_uniformProjectionId = glGetUniformLocation(_shader.id(), "projection_matrix");
-
-	//_texture_id = 0;
-
-	// You should probably use CSurface::OnLoad ... ;)
-	//-- and make sure the Surface pointer is good!
-	//stringstream ss;
-	//ss << "../OGL-SDL_Template/app/resources/ObjTex/QuantumArid_Diffuse_" << _name[10] << ".jpg";
-	//_texture = IMG_Load(ss.str().c_str());
-	/*
-	glActiveTexture(GL_TEXTURE0 + 0);
-	glGenTextures(1, &_texture_id);
-	glBindTexture(GL_TEXTURE_2D, _texture_id);
-	glBindSampler(0, GL_LINEAR);
-
-	int mode = GL_RGB;
-	if (_texture->format->BytesPerPixel == 4) mode = GL_RGBA;
-
-	glTexImage2D(GL_TEXTURE_2D, 0, mode, _texture->w, _texture->h, 0, mode, GL_UNSIGNED_BYTE, _texture->pixels);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);*/
 }
 
 void Mesh::cleanup() {
@@ -98,20 +73,6 @@ void Mesh::cleanup() {
 	glDeleteBuffers(1, _vbo);
 	glDeleteTextures(1, &_tso);*/
 }
-
-
-/*
-void Mesh::scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues){
-	_shader.use();
-	_shader.scatteringVariables(scattValues);
-	CheckErr();
-}
-void Mesh::scatteringConstants(Shader::ScatteringUniformConstants_values scattValues){
-	_shader.use();
-	_shader.scatteringConstants(scattValues);
-	CheckErr();
-}
-*/
 
 void Mesh::draw() {
 	// Activamos el vertex array Object
