@@ -111,67 +111,6 @@ void Shader::scatteringConstants(ScatteringUniformConstants_values scattValues) 
 	//IMG_SavePNG(texR, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapRay.png");
 }
 
-/*
-void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValues, SDL_Surface* &texR, SDL_Surface* &texM) {
-
-	texR = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white.png");
-	texM = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white2.png");
-	
-	GLfloat atmHeight = scattValues.ATM_TOP_HEIGHT;
-	GLfloat atmRadius = scattValues.WORLD_RADIUS + scattValues.ATM_TOP_HEIGHT;
-	GLfloat atmRadius2 = atmRadius * atmRadius;
-	GLfloat earthRadius = scattValues.WORLD_RADIUS;
-	GLfloat H_R = scattValues.H_R;
-	GLfloat H_M = scattValues.H_M;
-	GLfloat P0 = scattValues.P0;
-
-	GLfloat STEPS = 50.0f;
-
-	Uint32 *pixR = (Uint32 *)texR->pixels;
-	Uint32 *pixM = (Uint32 *)texM->pixels;
-
-	// Hay que generalizarlo
-	GLuint accum = 0;
-	for (GLint w = 0; w < texR->w; w += 1) {
-		GLfloat initialHeight = ((atmRadius - earthRadius) * w) / texR->w;
-		GLfloat point_earth = initialHeight + earthRadius;
-		vmath::vec2 point(0.0f, point_earth);
-
-		for (GLint h = 0; h < texR->h; h += 1) {
-			GLfloat cosPhi = (2.0f * h / (texR->h - 1)) - 1.0f;
-			GLfloat senPhi = sqrt(1.0f - cosPhi*cosPhi);
-
-			vmath::vec2 normLightDir(senPhi, -cosPhi);
-
-			GLfloat b = 2 * point_earth * -cosPhi;
-			GLfloat c = point_earth * point_earth - atmRadius2;
-			GLfloat sqrt_bb_4c = sqrt(b*b - 4 * c);
-			GLfloat a1 = (b + sqrt_bb_4c) / 2;
-			GLfloat a2 = (b - sqrt_bb_4c) / 2;
-			
-			GLfloat diferential_A = fmax(a1, a2) / STEPS;
-			vmath::vec2 delta_A(-normLightDir * diferential_A);
-
-			GLfloat density_AP[2] = { 0.0, 0.0 };
-			accum++;
-
-			for (GLfloat step = 0.5f; step < STEPS; step += 1.0f) {
-				GLfloat hPoint = vmath::distance(vmath::vec2(0.0f, 0.0f), point + delta_A * step) - earthRadius;
-				
-				GLfloat relation[2] = { -hPoint / H_R, -hPoint / H_M };
-				density_AP[0] += P0 * exp(relation[0]) * diferential_A;
-				density_AP[1] += P0 * exp(relation[1]) * diferential_A;
-				
-			}
-
-			pixR[(h * texR->w) + w] = (Uint32)density_AP[0];
-			pixM[(h * texR->w) + w] = (Uint32)density_AP[1];
-		}
-	}
-}
-
-*/
-
 void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValues, SDL_Surface* &texR, SDL_Surface* &texM) {
 
 	texR = IMG_Load("../OGL-SDL_Template/app/resources/ObjTex/white.png");
@@ -192,15 +131,12 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 
 	for (GLint w = 0; w < texR->w; w += 1) {
 		GLfloat initialHeight = ((atmRadius - earthRadius) * w) / texR->w;
-		//float point_earth = length(point - cEarth);
 		GLfloat point_earth = initialHeight + earthRadius;
 		vmath::vec3 point(0.0f, point_earth, 0.0f);
 
 		for (GLint h = 0; h < texR->h; h += 1) {
-			//vec2 density_AP = vec2(0.0f, 0.0f);
 			GLfloat density_AP[2] = { 0.0, 0.0 };
 
-			//float comp_cosPhi = -cosPhi;
 			GLfloat cosPhi = (2.0f * h / (texR->h - 1)) - 1.0f;
 			GLfloat senPhi = sqrt(1.0f - cosPhi*cosPhi);
 			vmath::vec3 normLightDir(senPhi, -cosPhi, 0.0f);
@@ -215,7 +151,6 @@ void Shader::createHeightScatterMap(ScatteringUniformConstants_values scattValue
 				Log::warning(ss.str());
 			}
 
-			//vec3 A = -normLightDir * max(a1, a2) + point;
 			GLfloat diferential_A = vmath::distance(t1, t2) / STEPS;
 			vmath::vec3 delta_A(-normLightDir * diferential_A);
 

@@ -41,7 +41,6 @@ private:
 	GLuint _eboDataCount;
 
 	SDL_Surface* _texture;
-	//GLuint _uniformProjectionId;
 	GLuint *_ebo;
 	GLuint *_tso;
 	GLuint _vao[1];
@@ -60,8 +59,6 @@ public:
 	// SETTERS
 	void modelMatrix(vmath::mat4 modelMatrix) { _modelMatrix = modelMatrix; }
 	vmath::mat4 modelMatrix() { return _modelMatrix; }
-	//void scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues);
-	//void scatteringConstants(Shader::ScatteringUniformConstants_values scattValues);
 
 	//ACTIONS
 	void initOGLData();
