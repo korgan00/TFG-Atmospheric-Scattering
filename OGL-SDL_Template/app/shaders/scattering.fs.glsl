@@ -99,7 +99,7 @@ void main(void)
 
 		vec3 point = computedCam + delta_P * s;
 
-		float h = length(point - cEarth) - WORLD_RADIUS;
+		float h = max(length(point - cEarth) - WORLD_RADIUS, 0.0f);
 
 		vec3 normalEarth = normalize(point - cEarth);
 

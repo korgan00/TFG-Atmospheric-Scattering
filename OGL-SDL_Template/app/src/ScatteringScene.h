@@ -20,8 +20,18 @@ private:
 	Mesh* _mountains;
 	Mesh* _blueSphere;
 	Mesh* _deepSpace;
+	//Mesh* _sun;
+
+	Shader* _scatteringShading;
+	Shader* _orthoShading;
+
+	Shader::ScatteringUniformPseudoConstants_values scattPseudoConstValues();
+	Shader::ScatteringUniformConstants_values scattConstValues();
+
 public:
 	void initOGLData();
+
+	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 };
 
 #endif /* SCATT_SCENE_H_ */

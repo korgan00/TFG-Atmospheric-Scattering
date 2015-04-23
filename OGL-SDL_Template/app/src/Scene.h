@@ -10,6 +10,7 @@
 class Scene {
 protected:
 	std::vector<Mesh*> _sceneObjects;
+	Shader* _activeShader;
 
 public:
 	Scene() : _sceneObjects(std::vector<Mesh*>()) {}
@@ -31,6 +32,8 @@ public:
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
 			(*mesh)->initOGLData();
 		}
+
+		CheckErr();
 	}
 
 
@@ -38,12 +41,22 @@ public:
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
 			(*mesh)->cleanup();
 		}
+
+		CheckErr();
 	}
 
 	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
+		_activeShader->use();
+		_activeShader->projectionMatrix(projection_matrix);
+		_activeShader->camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
+
+		CheckErr();
+
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
-			(*mesh)->draw(projection_matrix, cameraPos);
+			_activeShader->modelMatrix((*mesh)->modelMatrix());
+			(*mesh)->draw();
 		}
+		CheckErr();
 	}
 };
 

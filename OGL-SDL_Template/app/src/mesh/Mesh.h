@@ -40,8 +40,6 @@ private:
 	PerDraw *_elementBufferObjectData;
 	GLuint _eboDataCount;
 
-	Shader _shader;
-
 	SDL_Surface* _texture;
 	//GLuint _uniformProjectionId;
 	GLuint *_ebo;
@@ -49,21 +47,26 @@ private:
 	GLuint _vao[1];
 	GLuint _vbo[1];
 	
+	vmath::mat4 _modelMatrix;
+
 public:
+
+	//Shader _shader;
 
 	Mesh(PerVertex* verticesInfo, GLuint verticesCount, PerDraw* drawInfo, GLuint drawCount) :
 		_vertexBufferObjectData(verticesInfo), _vboDataCount(verticesCount), 
-		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount), _shader() {}
+		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount) {}
 
 	// SETTERS
-	void modelMatrix(vmath::mat4 modelMatrix);
-	void scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues);
-	void scatteringConstants(Shader::ScatteringUniformConstants_values scattValues);
+	void modelMatrix(vmath::mat4 modelMatrix) { _modelMatrix = modelMatrix; }
+	vmath::mat4 modelMatrix() { return _modelMatrix; }
+	//void scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues);
+	//void scatteringConstants(Shader::ScatteringUniformConstants_values scattValues);
 
 	//ACTIONS
 	void initOGLData();
 	void cleanup();
-	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
+	void draw();
 };
 
 

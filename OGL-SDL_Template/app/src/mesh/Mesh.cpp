@@ -6,16 +6,6 @@
 
 void Mesh::initOGLData() {
 
-	ShaderInfo shaderFiles[] = {
-		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
-		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
-		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
-		{ GL_NONE, NULL }
-	};
-
-	_shader.load(shaderFiles);
-	_shader.use();
-
 	// Pedimos un buffer para el element buffer object
 	_ebo = new GLuint[_eboDataCount];
 	_tso = new GLuint[_eboDataCount];
@@ -79,8 +69,6 @@ void Mesh::initOGLData() {
 	CheckErr();
 	Log::trace("CHECKED!");
 
-	_shader.init();
-	_shader.modelMatrix(vmath::mat4::identity());
 	//_uniformProjectionId = glGetUniformLocation(_shader.id(), "projection_matrix");
 
 	//_texture_id = 0;
@@ -111,12 +99,8 @@ void Mesh::cleanup() {
 	glDeleteTextures(1, &_tso);*/
 }
 
-void Mesh::modelMatrix(vmath::mat4 modelMatrix) {
-	_shader.use();
-	_shader.modelMatrix(modelMatrix);
-	CheckErr();
-}
 
+/*
 void Mesh::scatteringVariables(Shader::ScatteringUniformPseudoConstants_values scattValues){
 	_shader.use();
 	_shader.scatteringVariables(scattValues);
@@ -127,24 +111,14 @@ void Mesh::scatteringConstants(Shader::ScatteringUniformConstants_values scattVa
 	_shader.scatteringConstants(scattValues);
 	CheckErr();
 }
+*/
 
-
-void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-	CheckErr();
-	_shader.use();
+void Mesh::draw() {
 	// Activamos el vertex array Object
 	glBindVertexArray(_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);
 
-	_shader.projectionMatrix(projection_matrix);
-	_shader.camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
 	CheckErr();
-
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, _shader._tso[0]);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, _shader._tso[1]);
-
 	// Activamos el buffer de indices
 	for (GLuint i = 0; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
@@ -157,6 +131,8 @@ void Mesh::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 		glDrawElements(GL_TRIANGLES, _elementBufferObjectData[i].indicesCount, GL_UNSIGNED_INT, 0);
 		CheckErr();
 	}
+
+	CheckErr();
 }
 
 

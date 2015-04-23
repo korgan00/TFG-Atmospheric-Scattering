@@ -11,33 +11,69 @@ const GLfloat ScatteringScene::PARTICLE_SCALE_HEIGHT_MIE = 1200.0f;
 
 void ScatteringScene::initOGLData() {
 
-	ObjLoader::ObjFileInfo* mountainsObj = ObjLoader::load("Arid.obj");
-	_mountains = ObjToMesh::convert(mountainsObj, new MountainTextureFactory());
-	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("sphere2.obj"); /*/ // Massive poligon
-	ObjLoader::ObjFileInfo* sphereObj = ObjLoader::load("sphere.obj"); // light*/
-	_blueSphere = ObjToMesh::convert(sphereObj);
-	ObjLoader::ObjFileInfo* spaceObj = ObjLoader::load("deepSpace.obj");
-	_deepSpace = ObjToMesh::convert(spaceObj);
+	ShaderInfo scatteringFiles[] = {
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
+		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
+		{ GL_NONE, NULL }
+	};
+
+	ShaderInfo orthoFiles[] = {
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
+		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
+		{ GL_NONE, NULL }
+	};
+
+	_scatteringShading = new Shader();
+	_orthoShading = new Shader();
+
+	_scatteringShading->load(scatteringFiles);
+	_orthoShading->load(orthoFiles);
+	/*
+	_orthoShading->use();
+	_orthoShading->init();
+	_orthoShading->modelMatrix(vmath::mat4::identity());
+	*/
+
+	_activeShader = _scatteringShading;
+	_activeShader->use();
+
+	_activeShader->init();
+	_activeShader->modelMatrix(vmath::mat4::identity());
 
 	CheckErr();
+
+	_activeShader->scatteringVariables(scattPseudoConstValues());
+	_activeShader->scatteringConstants(scattConstValues());
+
+	CheckErr();
+
+	_mountains  = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
+	/*_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
+	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere.obj")); // light*/
+	_deepSpace  = ObjToMesh::convert(ObjLoader::load("deepSpace.obj"));
+	//_sun		= ObjToMesh::convert(ObjLoader::load("sun.obj"));
+
 	addMesh(_mountains);
 	addMesh(_blueSphere);
 	addMesh(_deepSpace);
+	//addMesh(_sun);
 
 	Scene::initOGLData();
 
+	_mountains->modelMatrix(vmath::translate(0.0f, 0.0f, 0.0f) *
+		vmath::scale(MOUNTAINS_SCALE, MOUNTAINS_SCALE, MOUNTAINS_SCALE));
+	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) *
+		vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
+	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) *
+		vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
+
 	CheckErr();
 
-	Shader::ScatteringUniformPseudoConstants_values spcValues;
+}
 
-	spcValues.lightDir = vmath::vec3(0.0f, 0.3f, 1.0f);
-	spcValues.lightSun = 50.0f;
-
-	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
-	spcValues.betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f;
-	spcValues.betaER = spcValues.betaSR;
-	spcValues.betaEM = spcValues.betaSM * 1.1f;
-
+Shader::ScatteringUniformConstants_values ScatteringScene::scattConstValues() {
 	Shader::ScatteringUniformConstants_values scValues;
 
 	scValues.H_R = 7994.0f;
@@ -48,19 +84,28 @@ void ScatteringScene::initOGLData() {
 	scValues.G = 0.76f;
 	scValues.P0 = 1.0f;
 
+	return scValues;
+}
 
-	CheckErr();
-	for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
-		(*mesh)->scatteringVariables(spcValues);
-		(*mesh)->scatteringConstants(scValues);
-	}
+Shader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoConstValues() {
+	Shader::ScatteringUniformPseudoConstants_values spcValues;
 
-	CheckErr();
-	_mountains->modelMatrix(vmath::translate(0.0f, 0.0f, 0.0f) * 
-							vmath::scale(MOUNTAINS_SCALE, MOUNTAINS_SCALE, MOUNTAINS_SCALE));
-	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * 
-							 vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
-	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) * 
-							vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
+	spcValues.lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
+	spcValues.lightSun = 50.0f;
 
+	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
+	spcValues.betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f;
+	spcValues.betaER = spcValues.betaSR;
+	spcValues.betaEM = spcValues.betaSM * 1.1f;
+
+	return spcValues;
+}
+
+void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, _activeShader->_tso[0]);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, _activeShader->_tso[1]);
+
+	Scene::draw(projection_matrix, cameraPos);
 }
