@@ -25,11 +25,11 @@ void ScatteringScene::initOGLData() {
 		{ GL_NONE, NULL }
 	};
 
-	_scatteringShading = new Shader();
-	_orthoShading = new Shader();
+	_scatteringShading = new ScatteringShader();
+	//_orthoShading = new Shader();
 
 	_scatteringShading->load(scatteringFiles);
-	_orthoShading->load(orthoFiles);
+	//_orthoShading->load(orthoFiles);
 	/*
 	_orthoShading->use();
 	_orthoShading->init();
@@ -44,13 +44,13 @@ void ScatteringScene::initOGLData() {
 
 	CheckErr();
 
-	_activeShader->scatteringVariables(scattPseudoConstValues());
-	_activeShader->scatteringConstants(scattConstValues());
+	_scatteringShading->scatteringVariables(scattPseudoConstValues());
+	_scatteringShading->scatteringConstants(scattConstValues());
 
 	CheckErr();
 
 	_mountains  = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
-	/*_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
+	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
 	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere.obj")); // light*/
 	_deepSpace  = ObjToMesh::convert(ObjLoader::load("deepSpace.obj"));
 	//_sun		= ObjToMesh::convert(ObjLoader::load("sun.obj"));
@@ -73,8 +73,8 @@ void ScatteringScene::initOGLData() {
 
 }
 
-Shader::ScatteringUniformConstants_values ScatteringScene::scattConstValues() {
-	Shader::ScatteringUniformConstants_values scValues;
+ScatteringShader::ScatteringUniformConstants_values ScatteringScene::scattConstValues() {
+	ScatteringShader::ScatteringUniformConstants_values scValues;
 
 	scValues.H_R = 7994.0f;
 	scValues.H_M = 1200.0f;
@@ -87,8 +87,8 @@ Shader::ScatteringUniformConstants_values ScatteringScene::scattConstValues() {
 	return scValues;
 }
 
-Shader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoConstValues() {
-	Shader::ScatteringUniformPseudoConstants_values spcValues;
+ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoConstValues() {
+	ScatteringShader::ScatteringUniformPseudoConstants_values spcValues;
 
 	spcValues.lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
 	spcValues.lightSun = 50.0f;
@@ -102,10 +102,10 @@ Shader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoCons
 }
 
 void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, _activeShader->_tso[0]);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, _activeShader->_tso[1]);
-
+	_activeShader = _shadowMapShading;
+	//cameraPos = loquesea;
+	Scene::draw(projection_matrix, cameraPos);
+	//bufferCopy
+	_activeShader = _scatteringShading;
 	Scene::draw(projection_matrix, cameraPos);
 }

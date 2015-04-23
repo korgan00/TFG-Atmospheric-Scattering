@@ -15,7 +15,7 @@
 #include <math.h>
 #include "../../common/common.h"
 #include "SDL_image.h"
-#include "../Shader.h"
+#include "../shader/Shader.h"
 using namespace std;
 
 class Mesh {

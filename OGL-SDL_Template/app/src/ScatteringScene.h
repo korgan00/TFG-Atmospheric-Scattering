@@ -5,6 +5,7 @@
 #include "mesh/ObjLoader.h"
 #include "mesh/ObjToMesh.h"
 #include "mesh/MountainTextureFactory.h"
+#include "shader/ScatteringShader.h"
 
 class ScatteringScene : public Scene {
 private:
@@ -22,11 +23,11 @@ private:
 	Mesh* _deepSpace;
 	//Mesh* _sun;
 
-	Shader* _scatteringShading;
+	ScatteringShader* _scatteringShading;
 	Shader* _orthoShading;
 
-	Shader::ScatteringUniformPseudoConstants_values scattPseudoConstValues();
-	Shader::ScatteringUniformConstants_values scattConstValues();
+	ScatteringShader::ScatteringUniformPseudoConstants_values scattPseudoConstValues();
+	ScatteringShader::ScatteringUniformConstants_values scattConstValues();
 
 public:
 	void initOGLData();

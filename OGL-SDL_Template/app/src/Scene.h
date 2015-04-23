@@ -5,7 +5,7 @@
 #include <vector>
 #include "../common/common.h"
 #include "mesh/Mesh.h"
-#include "Shader.h"
+#include "shader/Shader.h"
 
 class Scene {
 protected:

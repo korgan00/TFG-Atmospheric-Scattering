@@ -22,7 +22,9 @@
     <ClCompile Include="app\src\mesh\ObjLoader.cpp" />
     <ClCompile Include="app\src\mesh\ObjToMesh.cpp" />
     <ClCompile Include="app\src\ScatteringScene.cpp" />
-    <ClCompile Include="app\src\Shader.cpp" />
+    <ClCompile Include="app\src\shader\ScatteringShader.cpp" />
+    <ClCompile Include="app\src\shader\Shader.cpp" />
+    <ClCompile Include="app\src\shader\ShadowMapShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\common.h" />
@@ -38,7 +40,9 @@
     <ClInclude Include="app\src\mesh\ObjToMesh.h" />
     <ClInclude Include="app\src\ScatteringScene.h" />
     <ClInclude Include="app\src\Scene.h" />
-    <ClInclude Include="app\src\Shader.h" />
+    <ClInclude Include="app\src\shader\ScatteringShader.h" />
+    <ClInclude Include="app\src\shader\Shader.h" />
+    <ClInclude Include="app\src\shader\ShadowMapShader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app\shaders\fog.fs.glsl" />
