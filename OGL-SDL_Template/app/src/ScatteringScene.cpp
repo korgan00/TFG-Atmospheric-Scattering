@@ -19,38 +19,39 @@ void ScatteringScene::initOGLData() {
 	};
 
 	ShaderInfo orthoFiles[] = {
-		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
-		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.vert" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
 		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
 		{ GL_NONE, NULL }
 	};
 
+	ScatteringShader::ScatteringUniformPseudoConstants_values sPCV = scattPseudoConstValues();
+	ScatteringShader::ScatteringUniformConstants_values sCV = scattConstValues();
+
 	_scatteringShading = new ScatteringShader();
-	//_orthoShading = new Shader();
+	_shadowMapShading = new ShadowMapShader();
 
 	_scatteringShading->load(scatteringFiles);
-	//_orthoShading->load(orthoFiles);
-	/*
-	_orthoShading->use();
-	_orthoShading->init();
-	_orthoShading->modelMatrix(vmath::mat4::identity());
-	*/
-
-	_activeShader = _scatteringShading;
-	_activeShader->use();
-
-	_activeShader->init();
-	_activeShader->modelMatrix(vmath::mat4::identity());
+	_scatteringShading->use();
+	_scatteringShading->init();
+	_scatteringShading->scatteringVariables(sPCV);
+	_scatteringShading->scatteringConstants(sCV);
 
 	CheckErr();
 
-	_scatteringShading->scatteringVariables(scattPseudoConstValues());
-	_scatteringShading->scatteringConstants(scattConstValues());
 
+	_shadowMapShading->load(orthoFiles);
+	_shadowMapShading->lightDir(sPCV.lightDir);
+	_shadowMapShading->cEarth(sCV.C_EARTH);
+	_shadowMapShading->use();
+	_shadowMapShading->init();
+	
 	CheckErr();
+
+	_activeShader = _shadowMapShading;
 
 	_mountains  = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
-	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
+	/*_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
 	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere.obj")); // light*/
 	_deepSpace  = ObjToMesh::convert(ObjLoader::load("deepSpace.obj"));
 	//_sun		= ObjToMesh::convert(ObjLoader::load("sun.obj"));
@@ -62,11 +63,14 @@ void ScatteringScene::initOGLData() {
 
 	Scene::initOGLData();
 
-	_mountains->modelMatrix(vmath::translate(0.0f, 0.0f, 0.0f) *
+	_mountains->modelMatrix(
+		vmath::translate(0.0f, 0.0f, 0.0f) *
 		vmath::scale(MOUNTAINS_SCALE, MOUNTAINS_SCALE, MOUNTAINS_SCALE));
-	_blueSphere->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) *
+	_blueSphere->modelMatrix(
+		vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) *
 		vmath::scale(EARTH_RADIUS, EARTH_RADIUS, EARTH_RADIUS));
-	_deepSpace->modelMatrix(vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) *
+	_deepSpace->modelMatrix(
+		vmath::translate(0.0f, -EARTH_RADIUS, 0.0f) *
 		vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
 
 	CheckErr();
@@ -90,7 +94,7 @@ ScatteringShader::ScatteringUniformConstants_values ScatteringScene::scattConstV
 ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoConstValues() {
 	ScatteringShader::ScatteringUniformPseudoConstants_values spcValues;
 
-	spcValues.lightDir = vmath::vec3(0.0f, -1.0f, 1.0f);
+	spcValues.lightDir = vmath::vec3(0.0f, -1.0f, 0.0f);
 	spcValues.lightSun = 50.0f;
 
 	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
@@ -102,10 +106,22 @@ ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scatt
 }
 
 void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-	_activeShader = _shadowMapShading;
+	//_activeShader = _shadowMapShading;
 	//cameraPos = loquesea;
-	Scene::draw(projection_matrix, cameraPos);
+	//vmath::perspective(fovy, aspect, near, far);
+	//vmath::frustum(left, right, bottom, top, near, far);
+	//Scene::draw(projection_matrix, cameraPos); 
+	// 
 	//bufferCopy
-	_activeShader = _scatteringShading;
+	/*_activeShader = _scatteringShading;
+	_deepSpace->visible(false);/*/
+	
+	_activeShader = _shadowMapShading;
+	_deepSpace->visible(false);
 	Scene::draw(projection_matrix, cameraPos);
+	
+	_activeShader = _scatteringShading;
+	_deepSpace->visible(true);
+	Scene::draw(projection_matrix, cameraPos);
+
 }

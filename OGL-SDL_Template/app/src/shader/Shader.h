@@ -31,6 +31,8 @@ public:
 
 	virtual void init();
 
+	virtual void preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
+
 	inline void use(){ glUseProgram(_renderProg); }
 
 	inline GLuint id() { return _renderProg; };

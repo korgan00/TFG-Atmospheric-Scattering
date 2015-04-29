@@ -47,6 +47,7 @@ public:
 		GLuint P0;
 		GLuint densityRayleigh;
 		GLuint densityMie;
+		GLuint shadowMap;
 	} ScatteringUniformConstants_ids;
 
 	typedef struct {
@@ -74,6 +75,8 @@ private:
 public:
 	GLuint _tso[2];
 	void init();
+
+	void preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 
 	void scatteringVariables(ScatteringUniformPseudoConstants_values scattValues);
 

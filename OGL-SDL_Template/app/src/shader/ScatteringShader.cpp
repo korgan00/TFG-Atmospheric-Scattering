@@ -5,6 +5,7 @@ SDL_Surface* ScatteringShader::texDensityMie = nullptr;
 
 
 void ScatteringShader::init() {
+
 	Shader::init();
 
 	_SUids.lightDir = glGetUniformLocation(_renderProg, "lightDir");
@@ -34,6 +35,7 @@ void ScatteringShader::init() {
 
 	_SUconst.densityRayleigh = glGetUniformLocation(_renderProg, "densityRayleigh");
 	_SUconst.densityMie = glGetUniformLocation(_renderProg, "densityMie");
+	_SUconst.shadowMap = glGetUniformLocation(_renderProg, "shadowMap");
 
 	glGenTextures(2, _tso);
 	CheckErr();
@@ -70,6 +72,8 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 
 	glUniform1i(_SUconst.densityRayleigh, 6);
 	glUniform1i(_SUconst.densityMie, 5);
+	glUniform1i(_SUconst.shadowMap, 7);
+	
 	CheckErr();
 
 
@@ -80,15 +84,14 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 	glActiveTexture(GL_TEXTURE6);
 	glBindTexture(GL_TEXTURE_2D, _tso[0]);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texDensityRay->w, texDensityRay->h, 0,
-		GL_RGBA, GL_UNSIGNED_BYTE, texDensityRay->pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texDensityRay->w, texDensityRay->h, 
+		0, GL_RGBA, GL_UNSIGNED_BYTE, texDensityRay->pixels);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	CheckErr();
-
 
 
 	glActiveTexture(GL_TEXTURE5);
@@ -104,6 +107,15 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 
 	//IMG_SavePNG(texM, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapMie.png");
 	//IMG_SavePNG(texR, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapRay.png");
+}
+
+void ScatteringShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
+
+	Shader::preDraw(projection_matrix, cameraPos);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT);
+
 }
 
 void ScatteringShader::createHeightScatterMap(ScatteringUniformConstants_values scattValues, SDL_Surface* &texR, SDL_Surface* &texM) {

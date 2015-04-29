@@ -30,6 +30,7 @@ uniform vec3 betaSM;
 uniform sampler2D texture_diffuse;
 uniform sampler2D densityRayleigh;
 uniform sampler2D densityMie;
+uniform sampler2D shadowMap;
 uniform mat4 projection_matrix;
 
 uniform vec3 cam;
@@ -72,7 +73,7 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 void main(void)
 {
 	vec4 transfVec = vec4(256.0f * 256.0f * 256.0f, 256.0f * 256.0f, 256.0f, 1.0f) * 255.0f;
-	float N_STEPS = 30.0f;
+	float N_STEPS = 15.0f;
 
 	float _3_16PI = 3.0f / (16.0f * M_PI);
 	float _3_8PI = 3.0f / (8.0f * M_PI);

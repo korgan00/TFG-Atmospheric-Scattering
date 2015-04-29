@@ -46,10 +46,11 @@ public:
 	}
 
 	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-		_activeShader->use();
+		/*_activeShader->use();
 		_activeShader->projectionMatrix(projection_matrix);
 		_activeShader->camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
-
+		*/
+		_activeShader->preDraw(projection_matrix, cameraPos);
 		CheckErr();
 
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {

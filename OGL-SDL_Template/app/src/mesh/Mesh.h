@@ -47,18 +47,21 @@ private:
 	GLuint _vbo[1];
 	
 	vmath::mat4 _modelMatrix;
-
+	bool _visible;
 public:
 
 	//Shader _shader;
 
 	Mesh(PerVertex* verticesInfo, GLuint verticesCount, PerDraw* drawInfo, GLuint drawCount) :
-		_vertexBufferObjectData(verticesInfo), _vboDataCount(verticesCount), 
-		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount) {}
+		_vertexBufferObjectData(verticesInfo), _vboDataCount(verticesCount),
+		_elementBufferObjectData(drawInfo), _eboDataCount(drawCount), _visible(true) {}
 
 	// SETTERS
 	void modelMatrix(vmath::mat4 modelMatrix) { _modelMatrix = modelMatrix; }
 	vmath::mat4 modelMatrix() { return _modelMatrix; }
+
+	void visible(bool v) { _visible = v; }
+	bool visible() { return _visible; }
 
 	//ACTIONS
 	void initOGLData();

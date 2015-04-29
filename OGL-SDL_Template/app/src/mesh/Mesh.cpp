@@ -75,6 +75,8 @@ void Mesh::cleanup() {
 }
 
 void Mesh::draw() {
+	if (!_visible) return;
+
 	// Activamos el vertex array Object
 	glBindVertexArray(_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);

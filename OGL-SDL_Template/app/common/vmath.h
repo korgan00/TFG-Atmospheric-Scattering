@@ -598,7 +598,7 @@ public:
     }
 };
 
-typedef Tmat4<float> mat4;
+typedef Tmat4<float> mat4;	
 typedef Tmat4<int> imat4;
 typedef Tmat4<unsigned int> umat4;
 typedef Tmat4<double> dmat4;
