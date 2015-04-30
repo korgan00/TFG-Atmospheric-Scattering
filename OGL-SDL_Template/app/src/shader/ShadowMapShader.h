@@ -19,12 +19,15 @@ private:
 	GLuint ATM_RADIUS;
 	
 	GLuint _framebufferName;
+	vmath::mat4 _viewProjMatrix;
 
 public:
 	inline void lightDir(vmath::vec3 l) { _lightDir = l; }
 	inline void cEarth(vmath::vec3 c) { _cEarth = c; }
 
 	void init();
+
+	inline vmath::mat4 viewProjectionMatrix() { return _viewProjMatrix; }
 
 	void preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 

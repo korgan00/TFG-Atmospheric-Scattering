@@ -3,6 +3,7 @@
 //uniform mat4 model_matrix;
 uniform mat4 projection_matrix;
 uniform mat4 model_matrix;
+uniform mat4 depthBiasVP;
 
 layout(location = 0) in vec3 vPos;
 layout(location = 1) in vec3 vNorm;
@@ -10,6 +11,7 @@ layout(location = 2) in vec2 vTex;
 
 out vec4 vs_fs_color;
 out vec3 obj;
+out vec4 shadowCoord;
 
 void main(void) {
 	//////vec3 sun = vec3(1000, 1000, 1000);
@@ -22,6 +24,8 @@ void main(void) {
 	vec4 pos = (model_matrix * vec4(vPos, 1));
 	//pos.y -= 5;
 	vs_fs_color = vec4(vTex, 0, 1);
+
 	gl_Position = projection_matrix * pos;
+	shadowCoord = depthBiasVP * pos;
 	obj = pos.xyz;
 }

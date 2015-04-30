@@ -14,6 +14,7 @@ void ScatteringShader::init() {
 	_SUids.betaEM = glGetUniformLocation(_renderProg, "betaEM");
 	_SUids.betaSR = glGetUniformLocation(_renderProg, "betaSR");
 	_SUids.betaSM = glGetUniformLocation(_renderProg, "betaSM");
+	_SUids.depthBiasVP = glGetUniformLocation(_renderProg, "depthBiasVP");
 	CheckErr();
 
 
@@ -112,6 +113,14 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 void ScatteringShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 
 	Shader::preDraw(projection_matrix, cameraPos);
+
+	vmath::mat4 biasMatrix( vmath::vec4(0.5f, 0.f,  0.f,  0.f),
+							vmath::vec4(0.f,  0.5f, 0.f,  0.f),
+							vmath::vec4(0.f,  0.f,  0.5f, 0.f),
+							vmath::vec4(0.5f, 0.5f, 0.5f, 1.f));
+
+
+	glUniformMatrix4fv(_SUids.depthBiasVP, 1, GL_FALSE, biasMatrix * _shadowMapShader->viewProjectionMatrix());
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT);

@@ -8,6 +8,7 @@
 #ifndef SCATTERING_SHADER_H_
 #define SCATTERING_SHADER_H_
 #include "Shader.h"
+#include "ShadowMapShader.h"
 
 class ScatteringShader : public Shader {
 public:
@@ -19,6 +20,7 @@ public:
 		GLuint betaEM;		//VEC3
 		GLuint betaSR;		//VEC3
 		GLuint betaSM;		//VEC3
+		GLuint depthBiasVP;
 	} ScatteringUniformPseudoConstants_ids;
 
 	typedef struct {
@@ -72,8 +74,10 @@ private:
 	bool intersection(vmath::vec3 p1, vmath::vec3 p2, vmath::vec3 &t1, 
 		vmath::vec3 &t2, vmath::vec3 cEarth, float atmRadius_2);
 
-public:
 	GLuint _tso[2];
+public:
+	ShadowMapShader* _shadowMapShader;
+
 	void init();
 
 	void preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);

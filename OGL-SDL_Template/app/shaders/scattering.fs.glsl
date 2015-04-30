@@ -37,6 +37,7 @@ uniform vec3 cam;
 
 in vec4 vs_fs_color;
 in vec3 obj;
+in vec4 shadowCoord;
 
 layout (location = 0) out vec4 color;
 
@@ -152,8 +153,13 @@ void main(void)
 	//color = vs_fs_color;
 	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.st).rgb * extintion;
 	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
+
+	if(texture( shadowMap, shadowCoord.xy ).z < shadowCoord.z)
+		color = vec4( 1.0f, 0.0f, 0.0f, 1.0f );
+
 	//color = q? vec4(exp(-diferential_s/10000), exp(-diferential_s/1000), exp(-diferential_s/10), 1) : vec4(0,0,1,1);
 	
+	//color = vec4( shadowCoord.xyz, 1.0f );
 	//color = vec4(L0_Ext, 1);
 	//color = vec4(texture(densityRayleigh, vs_fs_color.st).rgb, 1);
 	//color = texture(texture_diffuse, vs_fs_color.xy);

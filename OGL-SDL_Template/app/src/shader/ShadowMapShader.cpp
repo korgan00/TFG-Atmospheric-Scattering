@@ -3,7 +3,7 @@
 void ShadowMapShader::init() {
 
 	Shader::init();
-	viewportSize = 1024;
+	viewportSize = 4096;
 
 	glGenFramebuffers(1, &_framebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
@@ -41,11 +41,10 @@ void ShadowMapShader::init() {
 
 void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	vmath::vec3 camPosSimple(cameraPos[0], cameraPos[1], cameraPos[2]);
-	Shader::preDraw(
-		sunViewMatrix(vmath::normalize(_lightDir),
-		vmath::vec3(0.0f, 1.0f, 0.001f),
-		camPosSimple,
-		10000.0f), cameraPos);
+	_viewProjMatrix = sunViewMatrix(vmath::normalize(_lightDir),
+		vmath::vec3(0.0f, 1.0f, 0.001f), camPosSimple, 2000.0f);
+
+	Shader::preDraw(_viewProjMatrix, cameraPos);
 
 	glViewport(0, 0, viewportSize, viewportSize);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -62,10 +61,10 @@ void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraP
 vmath::mat4 ShadowMapShader::sunViewMatrix(vmath::vec3 lightDir, vmath::vec3 up, 
 		vmath::vec3 cEarth, float distance) {
 	vmath::mat4 ortho = vmath::mat4::identity();
-	GLfloat halfWidth = 10000.0f;
-	GLfloat halfHeight = 10000.0f;
+	GLfloat halfWidth = 2500.0f;
+	GLfloat halfHeight = 2500.0f;
 	GLfloat zNear = 0.0f;
-	GLfloat zFar = 20000.0f;
+	GLfloat zFar = 4000.0f;
 
 	ortho[0][0] = 1 / halfWidth;// 100.0f / right;
 	ortho[1][1] = 1 / halfHeight;// 100.0f / top;

@@ -45,6 +45,8 @@ void ScatteringScene::initOGLData() {
 	_shadowMapShading->cEarth(sCV.C_EARTH);
 	_shadowMapShading->use();
 	_shadowMapShading->init();
+
+	_scatteringShading->_shadowMapShader = _shadowMapShading;
 	
 	CheckErr();
 
@@ -121,6 +123,6 @@ void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos)
 	Scene::draw(projection_matrix, cameraPos);
 	
 	_activeShader = _scatteringShading;
-	_deepSpace->visible(true);
+	//_deepSpace->visible(true);
 	Scene::draw(projection_matrix, cameraPos);
 }
