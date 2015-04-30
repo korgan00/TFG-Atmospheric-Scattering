@@ -58,7 +58,7 @@ void Engine::SetupOpenGL() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	_ctxt = SDL_GL_CreateContext(_window);
 
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval(1);
 
 	if (gl3wInit()) {
 		std::cout << "Error al Inicializar GL3W" << std::endl;
@@ -178,9 +178,6 @@ void Engine::OnCleanup() {
 
 
 void Engine::OnRender() {
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 	//_mesh->draw(_camera.matrix(), _camera.position());
 

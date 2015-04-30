@@ -123,5 +123,4 @@ void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos)
 	_activeShader = _scatteringShading;
 	_deepSpace->visible(true);
 	Scene::draw(projection_matrix, cameraPos);
-
 }

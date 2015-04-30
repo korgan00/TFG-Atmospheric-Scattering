@@ -12,7 +12,7 @@ void ShadowMapShader::init() {
 	glGenTextures(1, &depthTexture);
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, viewportSize, viewportSize,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, viewportSize, viewportSize,
 		0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -20,8 +20,17 @@ void ShadowMapShader::init() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
+	/*
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearDepth(1.0f);
 
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+	*/
 	glDrawBuffer(GL_NONE);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		Log::error("CHECKING FRAMEBUFFER STATUS");
@@ -31,19 +40,27 @@ void ShadowMapShader::init() {
 }
 
 void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-
+	vmath::vec3 camPosSimple(cameraPos[0], cameraPos[1], cameraPos[2]);
 	Shader::preDraw(
 		sunViewMatrix(vmath::normalize(_lightDir),
 		vmath::vec3(0.0f, 1.0f, 0.001f),
-		_cEarth,
-		vmath::length(_cEarth) + 10000.0f), cameraPos);
+		camPosSimple,
+		10000.0f), cameraPos);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
 	glViewport(0, 0, viewportSize, viewportSize);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _framebufferName);
+	glBlitFramebuffer(0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT,
+						0, 0, viewportSize,		 viewportSize,
+						GL_DEPTH_BUFFER_BIT,	 GL_NEAREST);
+	CheckErr();
 
 }
 
-vmath::mat4 ShadowMapShader::sunViewMatrix(vmath::vec3 lightDir, vmath::vec3 up, vmath::vec3 cEarth, float distance) {
+vmath::mat4 ShadowMapShader::sunViewMatrix(vmath::vec3 lightDir, vmath::vec3 up, 
+		vmath::vec3 cEarth, float distance) {
 	vmath::mat4 ortho = vmath::mat4::identity();
 	GLfloat halfWidth = 10000.0f;
 	GLfloat halfHeight = 10000.0f;

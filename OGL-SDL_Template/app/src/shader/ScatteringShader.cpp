@@ -115,6 +115,7 @@ void ScatteringShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 camera
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 }
 
