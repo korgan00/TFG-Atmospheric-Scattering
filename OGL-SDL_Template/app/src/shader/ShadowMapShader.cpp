@@ -3,7 +3,7 @@
 void ShadowMapShader::init() {
 
 	Shader::init();
-	viewportSize = 4096;
+	viewportSize = 8192;
 
 	glGenFramebuffers(1, &_framebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
@@ -14,8 +14,8 @@ void ShadowMapShader::init() {
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, viewportSize, viewportSize,
 		0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -52,8 +52,8 @@ void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraP
 	//glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _framebufferName);
 	glBlitFramebuffer(0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT,
-						0, 0, viewportSize,		 viewportSize,
-						GL_DEPTH_BUFFER_BIT,	 GL_NEAREST);
+					  0, 0, viewportSize, viewportSize,
+					  GL_DEPTH_BUFFER_BIT,	 GL_NEAREST);
 	CheckErr();
 
 }
@@ -61,10 +61,10 @@ void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraP
 vmath::mat4 ShadowMapShader::sunViewMatrix(vmath::vec3 lightDir, vmath::vec3 up, 
 		vmath::vec3 cEarth, float distance) {
 	vmath::mat4 ortho = vmath::mat4::identity();
-	GLfloat halfWidth = 2500.0f;
-	GLfloat halfHeight = 2500.0f;
+	GLfloat halfWidth = 20000.0f;
+	GLfloat halfHeight = 20000.0f;
 	GLfloat zNear = 0.0f;
-	GLfloat zFar = 4000.0f;
+	GLfloat zFar = 100000.0f;
 
 	ortho[0][0] = 1 / halfWidth;// 100.0f / right;
 	ortho[1][1] = 1 / halfHeight;// 100.0f / top;
@@ -78,9 +78,9 @@ vmath::mat4 ShadowMapShader::sunViewMatrix(vmath::vec3 lightDir, vmath::vec3 up,
 	float c = vmath::dot(a, lightDir);
 
 	vmath::mat4 vx({ vmath::vec4(0.0f, -v[2], v[1], 0.0f),
-		vmath::vec4(v[2], 0.0f, -v[0], 0.0f),
-		vmath::vec4(-v[1], v[0], 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.0f, 0.0f, 0.0f) });
+					 vmath::vec4(v[2], 0.0f, -v[0], 0.0f),
+					 vmath::vec4(-v[1], v[0], 0.0f, 0.0f),
+					 vmath::vec4(0.0f, 0.0f, 0.0f, 0.0f) });
 
 	float aux = ((1 - c) / (s*s));
 	vmath::mat4 vx2 = (vx*vx);

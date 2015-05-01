@@ -31,7 +31,9 @@ uniform sampler2D texture_diffuse;
 uniform sampler2D densityRayleigh;
 uniform sampler2D densityMie;
 uniform sampler2D shadowMap;
+
 uniform mat4 projection_matrix;
+uniform mat4 depthBiasVP;
 
 uniform vec3 cam;
 
@@ -71,10 +73,17 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 	return true;
 }
 
+float shadowDistance(vec3 p) {
+	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+
+	float bias = 0.0005;
+	return (shadowMapCoord.z - 0.0005) - texture( shadowMap, shadowMapCoord.xy ).z;
+}
+
 void main(void)
 {
 	vec4 transfVec = vec4(256.0f * 256.0f * 256.0f, 256.0f * 256.0f, 256.0f, 1.0f) * 255.0f;
-	float N_STEPS = 15.0f;
+	float N_STEPS = 30.0f;
 
 	float _3_16PI = 3.0f / (16.0f * M_PI);
 	float _3_8PI = 3.0f / (8.0f * M_PI);
@@ -128,7 +137,8 @@ void main(void)
 		vec3 difLM = partDenRM.y * betaSM * extinction_RM * diferential_s;
 
 		// Calcular visibilidad de P
-		float visi = cosPhi < -0.24f ? 0.0f : 1.0f;
+		//float visi = cosPhi < -0.24f ? 0.0f : 1.0f;
+		float visi = shadowDistance(point) > 0.0f? 0.0f : 1.0f;
 
 		rayLeigh_In += difLR * visi;
 		mie_In += difLM * visi;
@@ -153,9 +163,12 @@ void main(void)
 	//color = vs_fs_color;
 	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.st).rgb * extintion;
 	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
-
-	if(texture( shadowMap, shadowCoord.xy ).z < shadowCoord.z)
-		color = vec4( 1.0f, 0.0f, 0.0f, 1.0f );
+	
+	float diff = shadowDistance(obj);
+	if(diff > 0.0f){
+		color *= exp(-diff * 50);
+		//color *= 0.5;
+	}
 
 	//color = q? vec4(exp(-diferential_s/10000), exp(-diferential_s/1000), exp(-diferential_s/10), 1) : vec4(0,0,1,1);
 	
