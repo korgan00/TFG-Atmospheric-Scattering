@@ -16,3 +16,6 @@ void Shader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
 
 }
+
+
+void Shader::applyMaterial(Material* m, GLuint _tsoDiffuse, GLuint _tsoNormal){}

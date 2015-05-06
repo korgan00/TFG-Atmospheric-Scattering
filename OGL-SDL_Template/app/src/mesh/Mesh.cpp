@@ -7,9 +7,9 @@ void Mesh::initOGLData() {
 
 	// Pedimos un buffer para el element buffer object
 	_ebo = new GLuint[_eboDataCount];
-	_tso = new GLuint[_eboDataCount];
+	_tso = new GLuint[_eboDataCount*2];
 	glGenBuffers(_eboDataCount, _ebo);
-	glGenTextures(_eboDataCount, _tso);
+	glGenTextures(_eboDataCount*2, _tso);
 
 	for (GLuint i = 0; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
@@ -35,6 +35,23 @@ void Mesh::initOGLData() {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
+
+		if (_eboData->mat != nullptr && _eboData->mat->textureNormalMap != "") {
+			_texture = IMG_Load(("../OGL-SDL_Template/app/resources/ObjTex/" + _eboData->mat->textureNormalMap).c_str());
+
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, _tso[_eboDataCount + i]);
+
+			int mode = _texture->format->BytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+
+			glTexImage2D(GL_TEXTURE_2D, 0, mode, _texture->w, _texture->h, 0,
+				mode, GL_UNSIGNED_BYTE, _texture->pixels);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glGenerateMipmap(GL_TEXTURE_2D);
+		}
+
 		CheckErr();
 	}
 
@@ -74,7 +91,7 @@ void Mesh::cleanup() {
 	glDeleteTextures(1, &_tso);*/
 }
 
-void Mesh::draw() {
+void Mesh::draw(Shader* shader) {
 	if (!_visible) return;
 
 	// Activamos el vertex array Object
@@ -85,10 +102,8 @@ void Mesh::draw() {
 	// Activamos el buffer de indices
 	for (GLuint i = 0; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
-		if (_eboData->mat != nullptr && _eboData->mat->textureDiffuse != "") {
-			glActiveTexture(GL_TEXTURE0 + 0);
-			glBindTexture(GL_TEXTURE_2D, _tso[i]);
-		}
+
+		shader->applyMaterial(_eboData->mat, _tso[i], _tso[_eboDataCount + i]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo[i]);
 		glDrawElements(GL_TRIANGLES, _elementBufferObjectData[i].indicesCount, GL_UNSIGNED_INT, 0);

@@ -55,7 +55,7 @@ public:
 
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
 			_activeShader->modelMatrix((*mesh)->modelMatrix());
-			(*mesh)->draw();
+			(*mesh)->draw(_activeShader);
 		}
 		CheckErr();
 	}

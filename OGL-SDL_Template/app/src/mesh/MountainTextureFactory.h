@@ -10,9 +10,9 @@ public:
 		ss << "QuantumArid_Diffuse_" << objName[10] << ".jpg";
 		return ss.str();
 	}
-	string getNormalMapTexName(string objName) {
+	string getNormalMapTexName(string hint) {
 		stringstream ss;
-		ss << "QuantumArid_Diffuse_" << objName[10] << ".jpg";
+		ss << "nQuantumArid_Normal_" << hint[11] << ".jpg";
 		return ss.str();
 	}
 

@@ -31,12 +31,16 @@ void ScatteringShader::init() {
 	_SUconst.G = glGetUniformLocation(_renderProg, "G");
 	_SUconst.G2 = glGetUniformLocation(_renderProg, "G2");
 	_SUconst.P0 = glGetUniformLocation(_renderProg, "P0");
+
+	_textureIds.diffuse = glGetUniformLocation(_renderProg, "texture_diffuse");
+	_textureIds.normal = glGetUniformLocation(_renderProg, "texture_normalmap");
+
 	CheckErr();
 
 
-	_SUconst.densityRayleigh = glGetUniformLocation(_renderProg, "densityRayleigh");
-	_SUconst.densityMie = glGetUniformLocation(_renderProg, "densityMie");
-	_SUconst.shadowMap = glGetUniformLocation(_renderProg, "shadowMap");
+	_textureIds.densityRayleigh = glGetUniformLocation(_renderProg, "densityRayleigh");
+	_textureIds.densityMie = glGetUniformLocation(_renderProg, "densityMie");
+	_textureIds.shadowMap = glGetUniformLocation(_renderProg, "shadowMap");
 
 	glGenTextures(2, _tso);
 	CheckErr();
@@ -71,9 +75,12 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 	glUniform1f(_SUconst.G2, scattValues.G * scattValues.G);
 	glUniform1f(_SUconst.P0, scattValues.P0);
 
-	glUniform1i(_SUconst.densityRayleigh, 6);
-	glUniform1i(_SUconst.densityMie, 5);
-	glUniform1i(_SUconst.shadowMap, 7);
+	glUniform1i(_textureIds.diffuse, 0);
+	glUniform1i(_textureIds.normal, 2);
+
+	glUniform1i(_textureIds.densityRayleigh, 6);
+	glUniform1i(_textureIds.densityMie, 5);
+	glUniform1i(_textureIds.shadowMap, 7);
 	
 	CheckErr();
 
@@ -109,6 +116,23 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 	//IMG_SavePNG(texM, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapMie.png");
 	//IMG_SavePNG(texR, "C:/Users/MisiKorgan/Desktop/pruebaScatterMapRay.png");
 }
+
+void ScatteringShader::applyMaterial(Material* mat, GLuint _tsoDiffuse, GLuint _tsoNormal) {
+	glActiveTexture(GL_TEXTURE0);
+	if (mat != nullptr && mat->textureDiffuse != "") {
+		glBindTexture(GL_TEXTURE_2D, _tsoDiffuse);
+	} else {
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	glActiveTexture(GL_TEXTURE2);
+	if (mat != nullptr && mat->textureNormalMap != "") {
+		glBindTexture(GL_TEXTURE_2D, _tsoNormal);
+	} else {
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+}
+
 
 void ScatteringShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 

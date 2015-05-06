@@ -66,7 +66,8 @@ public:
 	//ACTIONS
 	void initOGLData();
 	void cleanup();
-	void draw();
+	void draw(Shader* shader);
+
 };
 
 

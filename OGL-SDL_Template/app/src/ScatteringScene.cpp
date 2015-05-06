@@ -96,7 +96,7 @@ ScatteringShader::ScatteringUniformConstants_values ScatteringScene::scattConstV
 ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoConstValues() {
 	ScatteringShader::ScatteringUniformPseudoConstants_values spcValues;
 
-	spcValues.lightDir = vmath::vec3(0.0f, -0.1f, 1.0f);
+	spcValues.lightDir = vmath::vec3(0.0f, -0.2f, 1.0f);
 	spcValues.lightSun = 50.0f;
 
 	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;

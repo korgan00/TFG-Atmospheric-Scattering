@@ -369,6 +369,10 @@ void ObjLoader::processMtlLib(char line[256], Materials &mtllibs) {
 						case 'd':
 							break;
 						case 'b':
+							if (buffer[5] == 'u' && buffer[6] == 'm' &&	buffer[7] == 'p') {
+								currMtl->textureNormalMap = string(buffer);
+								currMtl->textureNormalMap.erase(0, 9);
+							}
 							break;
 						default:;
 					}

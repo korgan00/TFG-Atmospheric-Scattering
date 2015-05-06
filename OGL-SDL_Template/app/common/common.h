@@ -43,6 +43,7 @@ typedef struct {
 
 	GLint illumination;
 	string textureDiffuse;
+	string textureNormalMap;
 } Material;
 typedef struct {
 	Material *materials;

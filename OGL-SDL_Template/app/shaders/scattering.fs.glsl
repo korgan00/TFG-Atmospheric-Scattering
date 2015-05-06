@@ -28,6 +28,8 @@ uniform vec3 betaSM;
 
 // VARIABLES
 uniform sampler2D texture_diffuse;
+uniform sampler2D texture_normalmap;
+
 uniform sampler2D densityRayleigh;
 uniform sampler2D densityMie;
 uniform sampler2D shadowMap;
@@ -37,7 +39,9 @@ uniform mat4 depthBiasVP;
 
 uniform vec3 cam;
 
-in vec4 vs_fs_color;
+in vec4 vertex_tex;
+in vec3 vertex_normal;
+
 in vec3 obj;
 in vec4 shadowCoord;
 
@@ -75,14 +79,46 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 
 float shadowDistance(vec3 p) {
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	float bias = 0.0003;
+	/*
+	mat3 gaussian = mat3(2.25f/25, 3.0f/25, 2.25f/25,
+						 3.0f/25,  4.0f/25, 3.0f/25,
+						 2.25f/25, 3.0f/25, 2.25f/25);
+						 
+	float diff = 0.0f;
+	for(int i = -1; i < 2; i+=1) {
+		for(int j = -1; j < 2; j+=1) {
+			vec2 pp = vec2(shadowMapCoord.x + bias * i, shadowMapCoord.y + bias * j); 
+			diff += ((shadowMapCoord.z - bias) - texture( shadowMap, pp ).z) * gaussian[i+1][j+1];
+		}
+	}
+	*/
+	//return diff;
+	return ((shadowMapCoord.z - bias) - texture( shadowMap, shadowMapCoord.xy ).z);
+}
 
-	float bias = 0.0005;
-	return (shadowMapCoord.z - 0.0005) - texture( shadowMap, shadowMapCoord.xy ).z;
+float shadowDistanceBlur(vec3 p) {
+	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	float bias = 0.0003;
+	
+	mat3 gaussian = mat3(2.25f/25, 3.0f/25, 2.25f/25,
+						 3.0f/25,  4.0f/25, 3.0f/25,
+						 2.25f/25, 3.0f/25, 2.25f/25);
+						 
+	float diff = 0.0f;
+	for(int i = -1; i < 2; i+=1) {
+		for(int j = -1; j < 2; j+=1) {
+			vec2 pp = vec2(shadowMapCoord.x + bias * i, shadowMapCoord.y + bias * j); 
+			diff += ((shadowMapCoord.z - bias) - texture( shadowMap, pp ).z) * gaussian[i+1][j+1];
+		}
+	}
+	
+	return diff;
 }
 
 void main(void)
 {
-	vec4 transfVec = vec4(256.0f * 256.0f * 256.0f, 256.0f * 256.0f, 256.0f, 1.0f) * 255.0f;
+	vec4 transfVec = vec4(256.0f * 256.0f * 256.0f, 256.0f * 256.0f, 256.0f, 1.0f) * 256.0f;
 	float N_STEPS = 30.0f;
 
 	float _3_16PI = 3.0f / (16.0f * M_PI);
@@ -160,22 +196,50 @@ void main(void)
 	vec3 inScattering = (rayLeigh_In * phase_rayLeigh + mie_In * phase_mieScattering) * lightSun;
 	vec3 extintion = exp(-(density_PC.x * betaER + density_PC.y * betaEM));
 
-	//color = vs_fs_color;
-	vec3 L0_Ext = texture(texture_diffuse, vs_fs_color.st).rgb * extintion;
+	//color = vertex_tex;
+	vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
+	vec3 normalmap_Color = texelColor;
+	if (distance(obj, C_EARTH) < ATM_RADIUS) {
+		vec3 Kambi = vec3(0.2188f, 0.2188f, 0.2188f);
+		vec3 Kdiff = vec3(0.9888f, 0.9888f, 0.9888f);
+		vec3 Kspec = vec3(0.0f, 0.0f, 0.0f);
+	
+		vec3 texelNormal = normalize(texture(texture_normalmap, vertex_tex.st).rgb);
+		vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
+		vec3 normal = cross(cross(vertex_normal, texelNormal), texelNormal);
+		float diffuseFactor = clamp(dot(normLightDir, normal), 0.0f, 1.0f);
+		float specularFactor = pow(clamp(dot(normalize(obj2-computedCam), reflect(-normLightDir, normal)), 0,1 ), 5.0f);
+
+		normalmap_Color =  Kambi * texelColor +
+						   Kdiff * texelColor * diffuseFactor +
+						   Kspec * pow(specularFactor, 5.0f);
+
+
+		float diff = shadowDistanceBlur(obj);
+		if(diff > 0.0f) {
+			normalmap_Color *= exp(-diff * 120);
+			//color *= 0.5;
+		}
+	}
+
+	vec3 L0_Ext = normalmap_Color * extintion;
 	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
 	
-	float diff = shadowDistance(obj);
-	if(diff > 0.0f){
-		color *= exp(-diff * 50);
-		//color *= 0.5;
-	}
+	//color = vec4(LambertFactor,LambertFactor,LambertFactor, 1.0f);
+	//color = vec4(normalmap_Color, 1.0f);
+	//vec3 auxxx = texelColor * Kdiff * diffuseFactor;
+	//color = vec4(auxxx, 1.0f);
+	//color = texture(texture_diffuse, vertex_tex.st);
+	//color = vec4(specularFactor,specularFactor,specularFactor, 0.0f);
+
+	
 
 	//color = q? vec4(exp(-diferential_s/10000), exp(-diferential_s/1000), exp(-diferential_s/10), 1) : vec4(0,0,1,1);
 	
 	//color = vec4( shadowCoord.xyz, 1.0f );
 	//color = vec4(L0_Ext, 1);
-	//color = vec4(texture(densityRayleigh, vs_fs_color.st).rgb, 1);
-	//color = texture(texture_diffuse, vs_fs_color.xy);
+	//color = vec4(texture(densityRayleigh, vertex_tex.st).rgb, 1);
+	//color = texture(texture_diffuse, vertex_tex.xy);
 	//color = vec4(inScattering, 1);
 	//color = vec4(phase_mieScattering, phase_mieScattering, phase_mieScattering, 1);
 	//color = vec4(inScattering, 1);

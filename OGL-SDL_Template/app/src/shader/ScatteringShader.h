@@ -47,9 +47,6 @@ public:
 		GLuint G;
 		GLuint G2;
 		GLuint P0;
-		GLuint densityRayleigh;
-		GLuint densityMie;
-		GLuint shadowMap;
 	} ScatteringUniformConstants_ids;
 
 	typedef struct {
@@ -63,8 +60,18 @@ public:
 	} ScatteringUniformConstants_values;
 
 private:
+	typedef struct {
+		GLuint diffuse;
+		GLuint normal;
+
+		GLuint densityRayleigh;
+		GLuint densityMie;
+		GLuint shadowMap;
+	} TextureIds;
+
 	ScatteringUniformPseudoConstants_ids _SUids;
 	ScatteringUniformConstants_ids _SUconst;
+	TextureIds _textureIds;
 
 	static SDL_Surface *texDensityRay, *texDensityMie;
 
@@ -85,6 +92,8 @@ public:
 	void scatteringVariables(ScatteringUniformPseudoConstants_values scattValues);
 
 	void scatteringConstants(ScatteringUniformConstants_values scattValues);
+
+	void applyMaterial(Material* m, GLuint _tsoDiffuse, GLuint _tsoNormal);
 };
 
 #endif

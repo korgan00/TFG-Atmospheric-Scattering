@@ -32,7 +32,8 @@ public:
 	void preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 
 	static vmath::mat4 sunViewMatrix(vmath::vec3 lightDir, vmath::vec3 up, vmath::vec3 cEarth, float distance);
-
+	
+	void applyMaterial(Material* m, GLuint _tsoDiffuse, GLuint _tsoNormal);
 };
 
 #endif

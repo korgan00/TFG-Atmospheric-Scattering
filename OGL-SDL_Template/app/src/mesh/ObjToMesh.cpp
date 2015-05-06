@@ -105,18 +105,24 @@ void ObjToMesh::closeIndexBuffer(GLint &lastMaterial, const ObjLoader::ObjFileIn
 	if (currIndexes.size() > 0) {
 
 		Material *mtl = lastMaterial != -1 ? &objFile.mtl.materials[lastMaterial] : nullptr;
-		if (mtl == nullptr && ObjToMesh::_useObjNameAsTextureHint == GL_TRUE) {
-			mtl = new Material();
-			mtl->textureDiffuse = ObjToMesh::_converter->getDiffuseTexName(objName);
-			mtl->alpha = 1;
-			mtl->ambient = vmath::vec3(0.0f, 0.0f, 0.0f);
-			mtl->specular = vmath::vec3(0.6f, 0.6f, 0.6f);
-			mtl->diffuse = vmath::vec3(0.0f, 0.0f, 0.0f);
-			mtl->illumination = 1;
-			mtl->name = "";
-			mtl->opticalDensity = 0;
-			mtl->specularExponent = 1.0f;
+		if (ObjToMesh::_useObjNameAsTextureHint == GL_TRUE) {
+			if (mtl == nullptr) {
+				mtl = new Material();
+				mtl->textureDiffuse = ObjToMesh::_converter->getDiffuseTexName(objName);
+				mtl->textureNormalMap = ObjToMesh::_converter->getNormalMapTexName(objName);
+				mtl->alpha = 1;
+				mtl->ambient = vmath::vec3(0.0f, 0.0f, 0.0f);
+				mtl->specular = vmath::vec3(0.6f, 0.6f, 0.6f);
+				mtl->diffuse = vmath::vec3(0.0f, 0.0f, 0.0f);
+				mtl->illumination = 1;
+				mtl->name = "";
+				mtl->opticalDensity = 0;
+				mtl->specularExponent = 1.0f;
+			} else if (mtl->textureNormalMap == "") {
+				mtl->textureNormalMap = ObjToMesh::_converter->getNormalMapTexName(mtl->name);
+			}
 		}
+
 
 		GLuint *indices = new GLuint[currIndexes.size()];
 		GLuint j = 0;

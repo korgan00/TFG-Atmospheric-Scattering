@@ -33,6 +33,8 @@ public:
 
 	virtual void preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 
+	virtual void applyMaterial(Material* m, GLuint _tsoDiffuse, GLuint _tsoNormal);
+
 	inline void use(){ glUseProgram(_renderProg); }
 
 	inline GLuint id() { return _renderProg; };
@@ -53,6 +55,7 @@ public:
 	inline void camera(vmath::vec3 cam) {
 		glUniform3fv(_commonUniforms.cam, 1, cam);
 	}
+
 };
 
 #endif

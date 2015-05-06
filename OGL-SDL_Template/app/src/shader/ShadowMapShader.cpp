@@ -3,7 +3,7 @@
 void ShadowMapShader::init() {
 
 	Shader::init();
-	viewportSize = 8192;
+	viewportSize = 4096;
 
 	glGenFramebuffers(1, &_framebufferName);
 	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
@@ -38,6 +38,9 @@ void ShadowMapShader::init() {
 	}
 
 }
+
+
+void ShadowMapShader::applyMaterial(Material* m, GLuint _tsoDiffuse, GLuint _tsoNormal) {}
 
 void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	vmath::vec3 camPosSimple(cameraPos[0], cameraPos[1], cameraPos[2]);
