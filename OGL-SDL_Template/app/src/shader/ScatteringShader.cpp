@@ -80,7 +80,7 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 
 	glUniform1i(_textureIds.densityRayleigh, 6);
 	glUniform1i(_textureIds.densityMie, 5);
-	glUniform1i(_textureIds.shadowMap, 7);
+	glUniform1i(_textureIds.shadowMap, 8);
 	
 	CheckErr();
 
@@ -95,8 +95,8 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texDensityRay->w, texDensityRay->h, 
 		0, GL_RGBA, GL_UNSIGNED_BYTE, texDensityRay->pixels);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	CheckErr();
@@ -108,8 +108,8 @@ void ScatteringShader::scatteringConstants(ScatteringUniformConstants_values sca
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texDensityMie->w, texDensityMie->h, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, texDensityMie->pixels);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	CheckErr();
 

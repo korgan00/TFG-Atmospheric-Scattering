@@ -8,10 +8,15 @@
 #include "shader/Shader.h"
 
 class Scene {
+private:
+	void initPostProcessPanel();
 protected:
 	std::vector<Mesh*> _sceneObjects;
 	Shader* _activeShader;
 
+	GLuint _postProVAO;
+	GLuint _postProVBO;
+	GLuint _postProEBO;
 public:
 	Scene() : _sceneObjects(std::vector<Mesh*>()) {}
 
@@ -32,7 +37,7 @@ public:
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
 			(*mesh)->initOGLData();
 		}
-
+		initPostProcessPanel();
 		CheckErr();
 	}
 
@@ -45,20 +50,10 @@ public:
 		CheckErr();
 	}
 
-	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-		/*_activeShader->use();
-		_activeShader->projectionMatrix(projection_matrix);
-		_activeShader->camera(vmath::vec3(cameraPos[0], cameraPos[1], cameraPos[2]));
-		*/
-		_activeShader->preDraw(projection_matrix, cameraPos);
-		CheckErr();
+	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
 
-		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
-			_activeShader->modelMatrix((*mesh)->modelMatrix());
-			(*mesh)->draw(_activeShader);
-		}
-		CheckErr();
-	}
+	void postProcessDraw();
+
 };
 
 #endif /* SCENE_H_ */

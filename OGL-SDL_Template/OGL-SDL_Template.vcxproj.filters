@@ -66,6 +66,12 @@
     <ClCompile Include="app\src\shader\ShadowMapShader.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
+    <ClCompile Include="app\src\Scene.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="app\src\shader\ShadowMapBlurShader.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app\common\vmath.h">
@@ -116,26 +122,31 @@
     <ClInclude Include="app\src\shader\ShadowMapShader.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="app\src\shader\ShadowMapBlurShader.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app\shaders\fog.fs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\geometry_instancingA.vs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\geometry_instancingB.vs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\simple.fs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\gouraud.frag" />
-    <None Include="app\shaders\gouraud.vert" />
-    <None Include="app\shaders\texture.fs.glsl" />
-    <None Include="app\shaders\texture.vs.glsl" />
     <None Include="app\shaders\scattering.fs.glsl" />
     <None Include="app\shaders\scattering.vs.glsl" />
-    <None Include="app\shaders\new.vs.glsl" />
+    <None Include="app\shaders\shadowMap.fs.glsl" />
+    <None Include="app\shaders\shadowMap.vs.glsl" />
+    <None Include="app\shaders\shadowMapBlur.fs.glsl" />
+    <None Include="app\shaders\delete\fog.fs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\delete\geometry_instancingA.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\delete\geometry_instancingB.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\delete\new.vs.glsl" />
+    <None Include="app\shaders\delete\texture.vs.glsl" />
+    <None Include="app\shaders\delete\simple.fs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\delete\texture.fs.glsl" />
+    <None Include="app\shaders\shadowMapBlur.vs.glsl" />
   </ItemGroup>
 </Project>

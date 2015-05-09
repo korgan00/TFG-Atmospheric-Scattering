@@ -94,12 +94,30 @@ float shadowDistance(vec3 p) {
 	}
 	*/
 	//return diff;
-	return ((shadowMapCoord.z - bias) - texture( shadowMap, shadowMapCoord.xy ).z);
+	return ((shadowMapCoord.z - bias) - texture( shadowMap, shadowMapCoord.xy ).x);
 }
 
 float shadowDistanceBlur(vec3 p) {
+	
+	float bias = 0.003;
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	vec2 moments = texture( shadowMap, shadowMapCoord.xy ).xy;
+
+	float e_x2 = moments.y;
+	float ex_2 = moments.x * moments.x;
+	float variance = e_x2 - ex_2;
+	float mD = moments.x - shadowMapCoord.z;
+	float mD_2 = mD * mD;
+	float diff = variance / (variance + mD);
+	
+	return clamp(((shadowMapCoord.z - bias) <= moments.x? 1.0f : diff), 0.0f, 1.0f);
+
+	//return moments.x;
+	/*/
+
+	
 	float bias = 0.0003;
+	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
 	
 	mat3 gaussian = mat3(2.25f/25, 3.0f/25, 2.25f/25,
 						 3.0f/25,  4.0f/25, 3.0f/25,
@@ -113,7 +131,7 @@ float shadowDistanceBlur(vec3 p) {
 		}
 	}
 	
-	return diff;
+	return diff; //*/
 }
 
 void main(void)
@@ -174,7 +192,7 @@ void main(void)
 
 		// Calcular visibilidad de P
 		//float visi = cosPhi < -0.24f ? 0.0f : 1.0f;
-		float visi = shadowDistance(point) > 0.0f? 0.0f : 1.0f;
+		float visi = 1;//shadowDistance(point);
 
 		rayLeigh_In += difLR * visi;
 		mie_In += difLM * visi;
@@ -214,17 +232,23 @@ void main(void)
 						   Kdiff * texelColor * diffuseFactor +
 						   Kspec * pow(specularFactor, 5.0f);
 
-
+		normalmap_Color *= shadowDistanceBlur(obj);
+		/*
 		float diff = shadowDistanceBlur(obj);
 		if(diff > 0.0f) {
 			normalmap_Color *= exp(-diff * 120);
 			//color *= 0.5;
-		}
+		} //*/
 	}
 
 	vec3 L0_Ext = normalmap_Color * extintion;
 	color = vec4(1.0f - exp(-1.0f * (L0_Ext + inScattering) ), 1.0f);
 	
+	/*
+	float d = shadowDistanceBlur(obj);
+	color = vec4(d, d, d, 1.0f);
+	*/
+
 	//color = vec4(LambertFactor,LambertFactor,LambertFactor, 1.0f);
 	//color = vec4(normalmap_Color, 1.0f);
 	//vec3 auxxx = texelColor * Kdiff * diffuseFactor;

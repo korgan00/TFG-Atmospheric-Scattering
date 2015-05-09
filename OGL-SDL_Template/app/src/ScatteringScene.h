@@ -7,6 +7,7 @@
 #include "mesh/MountainTextureFactory.h"
 #include "shader/ScatteringShader.h"
 #include "shader/ShadowMapShader.h"
+#include "shader/ShadowMapBlurShader.h"
 
 class ScatteringScene : public Scene {
 private:
@@ -26,6 +27,7 @@ private:
 
 	ScatteringShader* _scatteringShading;
 	ShadowMapShader* _shadowMapShading;
+	ShadowMapBlurShader* _shadowMapBlurShading;
 
 	ScatteringShader::ScatteringUniformPseudoConstants_values scattPseudoConstValues();
 	ScatteringShader::ScatteringUniformConstants_values scattConstValues();

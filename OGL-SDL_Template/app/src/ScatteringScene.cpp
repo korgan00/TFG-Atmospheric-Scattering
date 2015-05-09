@@ -19,8 +19,15 @@ void ScatteringScene::initOGLData() {
 	};
 
 	ShaderInfo orthoFiles[] = {
-		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.vert" },
-		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/shadowMap.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/shadowMap.fs.glsl" },
+		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
+		{ GL_NONE, NULL }
+	};
+
+	ShaderInfo shadowMapBlurFiles[] = {
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/shadowMapBlur.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/shadowMapBlur.fs.glsl" },
 		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
 		{ GL_NONE, NULL }
 	};
@@ -30,6 +37,7 @@ void ScatteringScene::initOGLData() {
 
 	_scatteringShading = new ScatteringShader();
 	_shadowMapShading = new ShadowMapShader();
+	_shadowMapBlurShading = new ShadowMapBlurShader();
 
 	_scatteringShading->load(scatteringFiles);
 	_scatteringShading->use();
@@ -39,7 +47,6 @@ void ScatteringScene::initOGLData() {
 
 	CheckErr();
 
-
 	_shadowMapShading->load(orthoFiles);
 	_shadowMapShading->lightDir(sPCV.lightDir);
 	_shadowMapShading->cEarth(sCV.C_EARTH);
@@ -47,7 +54,13 @@ void ScatteringScene::initOGLData() {
 	_shadowMapShading->init();
 
 	_scatteringShading->_shadowMapShader = _shadowMapShading;
-	
+
+	CheckErr();
+
+	_shadowMapBlurShading->load(shadowMapBlurFiles);
+	_shadowMapBlurShading->use();
+	_shadowMapBlurShading->init();
+
 	CheckErr();
 
 	_activeShader = _shadowMapShading;
@@ -108,21 +121,17 @@ ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scatt
 }
 
 void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-	//_activeShader = _shadowMapShading;
-	//cameraPos = loquesea;
-	//vmath::perspective(fovy, aspect, near, far);
-	//vmath::frustum(left, right, bottom, top, near, far);
-	//Scene::draw(projection_matrix, cameraPos); 
-	// 
-	//bufferCopy
-	/*_activeShader = _scatteringShading;
-	_deepSpace->visible(false);/*/
 	
 	_activeShader = _shadowMapShading;
 	_deepSpace->visible(false);
 	Scene::draw(projection_matrix, cameraPos);
+	//*/
 	
+	_activeShader = _shadowMapBlurShading;
+	Scene::postProcessDraw();
+	//*/
 	_activeShader = _scatteringShading;
 	_deepSpace->visible(true);
 	Scene::draw(projection_matrix, cameraPos);
+	//*/
 }
