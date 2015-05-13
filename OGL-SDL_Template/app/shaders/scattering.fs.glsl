@@ -32,7 +32,7 @@ uniform sampler2D texture_normalmap;
 
 uniform sampler2D densityRayleigh;
 uniform sampler2D densityMie;
-uniform sampler2D shadowMap;
+uniform sampler2DShadow shadowMap;
 
 uniform mat4 projection_matrix;
 uniform mat4 depthBiasVP;
@@ -94,23 +94,36 @@ float shadowDistance(vec3 p) {
 	}
 	*/
 	//return diff;
-	return ((shadowMapCoord.z - bias) - texture( shadowMap, shadowMapCoord.xy ).x);
+	return ((shadowMapCoord.z - bias) - texture( shadowMap, shadowMapCoord.xyz));
 }
 
 float shadowDistanceBlur(vec3 p) {
-	
+	/*
 	float bias = 0.003;
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	shadowMapCoord.x -= bias;
 	vec2 moments = texture( shadowMap, shadowMapCoord.xy ).xy;
 
 	float e_x2 = moments.y;
 	float ex_2 = moments.x * moments.x;
 	float variance = e_x2 - ex_2;
-	float mD = moments.x - shadowMapCoord.z;
+	// 
+	float mD = shadowMapCoord.z - moments.x; //Negativo debido a la comprobacion de abajo
+	// Cuando esta en sombra total es muy negativo
+	// Cuando esta en un filo de una sombra es poco negativo
 	float mD_2 = mD * mD;
 	float diff = variance / (variance + mD);
 	
-	return clamp(((shadowMapCoord.z - bias) <= moments.x? 1.0f : diff), 0.0f, 1.0f);
+	return clamp(max((shadowMapCoord.z <= moments.x? 1.0f : 0.0f), diff), 0.0f, 1.0f);
+	*/
+	
+	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	float bias = 0.003;
+	float shadowTexel = texture( shadowMap, shadowMapCoord.xyz);
+	float diff = shadowMapCoord.z - shadowTexel;
+
+	return (diff - bias) > 0.0f? shadowTexel : 1.0f;
+
 
 	//return moments.x;
 	/*/
@@ -226,6 +239,7 @@ void main(void)
 		vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
 		vec3 normal = cross(cross(vertex_normal, texelNormal), texelNormal);
 		float diffuseFactor = clamp(dot(normLightDir, normal), 0.0f, 1.0f);
+		//float diffuseFactor = min(clamp(dot(normLightDir, normal), 0.0f, 1.0f), shadowDistanceBlur(obj));
 		float specularFactor = pow(clamp(dot(normalize(obj2-computedCam), reflect(-normLightDir, normal)), 0,1 ), 5.0f);
 
 		normalmap_Color =  Kambi * texelColor +
