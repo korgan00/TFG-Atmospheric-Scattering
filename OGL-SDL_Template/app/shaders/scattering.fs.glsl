@@ -79,7 +79,8 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 
 float shadowDistance(vec3 p, float cosPhi) {
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
-	if( shadowMapCoord.x > 1 || shadowMapCoord.x < 0 || shadowMapCoord.y > 1 || shadowMapCoord.y < 0) {
+	if( shadowMapCoord.x > 1.0f || shadowMapCoord.x < 0.0f || 
+		shadowMapCoord.y > 1.0f || shadowMapCoord.y < 0.0f || cosPhi < -0.24f) {
 		return cosPhi < -0.24f ? 1.0f : 0.0f;
 	}
 	float bias = 0.0003;
@@ -103,7 +104,8 @@ float shadowDistance(vec3 p, float cosPhi) {
 
 float shadowDistanceBlur(vec3 p, float cosPhi) {
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
-	if( shadowMapCoord.x > 1 || shadowMapCoord.x < 0 || shadowMapCoord.y > 1 || shadowMapCoord.y < 0) {
+	if( shadowMapCoord.x > 1.0f || shadowMapCoord.x < 0.0f || 
+		shadowMapCoord.y > 1.0f || shadowMapCoord.y < 0.0f || cosPhi < -0.24f) {
 		return cosPhi < -0.24f ? 1.0f : 0.0f;
 	}
 	float bias = 0.0003;
@@ -242,7 +244,7 @@ void main(void)
 						   Kdiff * texelColor * diffuseFactor +
 						   Kspec * pow(specularFactor, 5.0f);
 
-/*
+		/*
 		float diff = shadowDistanceBlur(obj);
 		if(diff > 0.0f) {
 			normalmap_Color *= exp(-diff * 120);

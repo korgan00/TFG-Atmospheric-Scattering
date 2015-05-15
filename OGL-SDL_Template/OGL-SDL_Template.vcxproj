@@ -45,17 +45,17 @@
     <ClInclude Include="app\src\shader\ShadowMapShader.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app\shaders\fog.fs.glsl" />
-    <None Include="app\shaders\geometry_instancingA.vs.glsl" />
-    <None Include="app\shaders\geometry_instancingB.vs.glsl" />
-    <None Include="app\shaders\gouraud.frag" />
-    <None Include="app\shaders\gouraud.vert" />
-    <None Include="app\shaders\new.vs.glsl" />
+    <None Include="app\shaders\Trash\fog.fs.glsl" />
+    <None Include="app\shaders\Trash\geometry_instancingA.vs.glsl" />
+    <None Include="app\shaders\Trash\geometry_instancingB.vs.glsl" />
+    <None Include="app\shaders\shadowMap.fs.glsl" />
+    <None Include="app\shaders\shadowMap.vs.glsl" />
+    <None Include="app\shaders\Trash\new.vs.glsl" />
     <None Include="app\shaders\scattering.fs.glsl" />
     <None Include="app\shaders\scattering.vs.glsl" />
-    <None Include="app\shaders\simple.fs.glsl" />
-    <None Include="app\shaders\texture.fs.glsl" />
-    <None Include="app\shaders\texture.vs.glsl" />
+    <None Include="app\shaders\Trash\simple.fs.glsl" />
+    <None Include="app\shaders\Trash\texture.fs.glsl" />
+    <None Include="app\shaders\Trash\texture.vs.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{09FE37DC-EED0-46D0-ABA1-25E2839FC73A}</ProjectGuid>

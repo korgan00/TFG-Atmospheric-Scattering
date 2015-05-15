@@ -118,24 +118,24 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app\shaders\fog.fs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\geometry_instancingA.vs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\geometry_instancingB.vs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\simple.fs.glsl">
-      <Filter>shaders</Filter>
-    </None>
-    <None Include="app\shaders\gouraud.frag" />
-    <None Include="app\shaders\gouraud.vert" />
-    <None Include="app\shaders\texture.fs.glsl" />
-    <None Include="app\shaders\texture.vs.glsl" />
     <None Include="app\shaders\scattering.fs.glsl" />
     <None Include="app\shaders\scattering.vs.glsl" />
-    <None Include="app\shaders\new.vs.glsl" />
+    <None Include="app\shaders\Trash\fog.fs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\Trash\geometry_instancingA.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\Trash\geometry_instancingB.vs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\Trash\new.vs.glsl" />
+    <None Include="app\shaders\Trash\simple.fs.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="app\shaders\Trash\texture.fs.glsl" />
+    <None Include="app\shaders\Trash\texture.vs.glsl" />
+    <None Include="app\shaders\shadowMap.fs.glsl" />
+    <None Include="app\shaders\shadowMap.vs.glsl" />
   </ItemGroup>
 </Project>

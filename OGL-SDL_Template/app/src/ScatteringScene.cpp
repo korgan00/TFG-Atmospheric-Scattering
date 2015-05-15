@@ -3,7 +3,7 @@
 
 const GLfloat ScatteringScene::EARTH_RADIUS = 6360000.0f;
 const GLfloat ScatteringScene::ATM_TOP_HEIGHT = 80000.0f;
-const GLfloat ScatteringScene::DEEP_SPACE_RADIUS = EARTH_RADIUS * 1.4f;
+const GLfloat ScatteringScene::DEEP_SPACE_RADIUS = EARTH_RADIUS * 2.0f;
 const GLfloat ScatteringScene::MOUNTAINS_SCALE = 10.0f;
 
 const GLfloat ScatteringScene::PARTICLE_SCALE_HEIGHT_RAYLEIGH = 7994.0f;
@@ -18,14 +18,12 @@ void ScatteringScene::initOGLData() {
 	ShaderInfo scatteringFiles[] = {
 		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
 		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
-		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
 		{ GL_NONE, NULL }
 	};
 
 	ShaderInfo orthoFiles[] = {
-		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.vert" },
-		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
-		//{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/gouraud.frag" },
+		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/shadowMap.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/shadowMap.fs.glsl" },
 		{ GL_NONE, NULL }
 	};
 
