@@ -4,7 +4,7 @@
 const GLfloat CameraFPS::MOVMENT = 0.05f;
 const GLfloat CameraFPS::ROTATION = 0.15f;
 const GLfloat CameraFPS::MOUSE_ROTATION = 180.0f;
-const GLfloat CameraFPS::RENDER_DISTANCE = 10000000.0f;
+const GLfloat CameraFPS::RENDER_DISTANCE = 50000000.0f;
 
 CameraFPS::CameraFPS(SDL_Window* w) :
 		_captureMouse(false), _wrapping(false), _window(w), _velocity(0, 0, 0),
@@ -114,20 +114,6 @@ void CameraFPS::tick(GLfloat time, GLfloat elapsedTime) {
 		int winWidth, winHeight;
 		SDL_GetWindowSize(_window, &winWidth, &winHeight);
 		GLfloat aspect = float(DEFAULT_WIN_HEIGHT) / float(DEFAULT_WIN_WIDTH);
-		
-		vmath::mat4 ortho = vmath::mat4::identity();
-		GLfloat right = 10000.0f;
-		GLfloat left = -10000.0f;
-		GLfloat top = 10000.0f;
-		GLfloat bottom = -10000.0f;
-		GLfloat zNear = 1.0f;
-		GLfloat zFar = 1000000.0f;
-
-		ortho[0][0] = 1.0f/ 10000.0f;
-		ortho[1][1] = 1.0f / 10000.0f;
-		ortho[2][2] = -2.0f / 999999.0f;
-		ortho[3][2] = -1000001.0f / 999999.0f;
-		ortho[3][3] = 1.0f;
 
 		_currentMatrix = vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, RENDER_DISTANCE) * (currentRotation * _currentTranslation);
 	}

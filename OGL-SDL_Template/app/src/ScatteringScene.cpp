@@ -11,6 +11,10 @@ const GLfloat ScatteringScene::PARTICLE_SCALE_HEIGHT_MIE = 1200.0f;
 
 void ScatteringScene::initOGLData() {
 
+	_sunRotation = new vmath::vec2(0.0f, 0.0f);
+	_sunRotating = new vmath::vec2(0.0f, 0.0f);
+	_updateShadowMap = true;
+
 	ShaderInfo scatteringFiles[] = {
 		{ GL_VERTEX_SHADER, "../OGL-SDL_Template/app/shaders/scattering.vs.glsl" },
 		{ GL_FRAGMENT_SHADER, "../OGL-SDL_Template/app/shaders/scattering.fs.glsl" },
@@ -52,16 +56,15 @@ void ScatteringScene::initOGLData() {
 
 	_activeShader = _shadowMapShading;
 
-	_mountains  = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
-	/*_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
+	_mountains = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
+	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
 	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere.obj")); // light*/
 	_deepSpace  = ObjToMesh::convert(ObjLoader::load("deepSpace.obj"));
 	//_sun		= ObjToMesh::convert(ObjLoader::load("sun.obj"));
-
+	
 	addMesh(_mountains);
-	addMesh(_blueSphere);
 	addMesh(_deepSpace);
-	//addMesh(_sun);
+	addMesh(_blueSphere);
 
 	Scene::initOGLData();
 
@@ -76,7 +79,6 @@ void ScatteringScene::initOGLData() {
 		vmath::scale(DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS, DEEP_SPACE_RADIUS));
 
 	CheckErr();
-
 }
 
 ScatteringShader::ScatteringUniformConstants_values ScatteringScene::scattConstValues() {
@@ -96,7 +98,9 @@ ScatteringShader::ScatteringUniformConstants_values ScatteringScene::scattConstV
 ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scattPseudoConstValues() {
 	ScatteringShader::ScatteringUniformPseudoConstants_values spcValues;
 
-	spcValues.lightDir = vmath::vec3(0.0f, -0.2f, 1.0f);
+	vmath::vec4 sunRot = (vmath::rotate((*_sunRotation)[0], vmath::vec3(1.0f, 0.0f, 0.0f)) * vmath::translate(0.0f, -1.0f, 0.0f))[3];
+
+	spcValues.lightDir = vmath::vec3(sunRot[0], sunRot[1], sunRot[2]);
 	spcValues.lightSun = 50.0f;
 
 	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
@@ -108,21 +112,30 @@ ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scatt
 }
 
 void ScatteringScene::draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
-	//_activeShader = _shadowMapShading;
-	//cameraPos = loquesea;
-	//vmath::perspective(fovy, aspect, near, far);
-	//vmath::frustum(left, right, bottom, top, near, far);
-	//Scene::draw(projection_matrix, cameraPos); 
-	// 
-	//bufferCopy
-	/*_activeShader = _scatteringShading;
-	_deepSpace->visible(false);/*/
-	
-	_activeShader = _shadowMapShading;
-	_deepSpace->visible(false);
-	Scene::draw(projection_matrix, cameraPos);
+
+	if (_updateShadowMap) {
+		_activeShader = _shadowMapShading;
+		_deepSpace->visible(false);
+		Scene::draw(projection_matrix, cameraPos);
+		_updateShadowMap = false;
+	}
 	
 	_activeShader = _scatteringShading;
 	_deepSpace->visible(true);
 	Scene::draw(projection_matrix, cameraPos);
+}
+
+void ScatteringScene::tick(GLfloat time, GLfloat elapsedTime) {
+	if ((*_sunRotating)[0] != 0.0f || (*_sunRotating)[1] != 0.0f) {
+		*_sunRotation += *_sunRotating * (elapsedTime / 60);
+
+		ScatteringShader::ScatteringUniformPseudoConstants_values sPCV = scattPseudoConstValues();
+		_scatteringShading->scatteringVariables(sPCV);
+		_shadowMapShading->lightDir(sPCV.lightDir);
+		_updateShadowMap = true;
+	}
+}
+
+void ScatteringScene::rotateSunX(GLfloat amount) {
+	(*_sunRotating)[0] = amount;
 }

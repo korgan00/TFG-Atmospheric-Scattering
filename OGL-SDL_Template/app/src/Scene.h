@@ -28,6 +28,8 @@ public:
 	void addMesh (Mesh* mesh) { _sceneObjects.push_back(mesh); }
 
 	//ACTIONS
+	virtual void tick(GLfloat time, GLfloat elapsedTime) {}
+
 	void initOGLData() {
 		for (std::vector<Mesh*>::iterator mesh = _sceneObjects.begin(); mesh != _sceneObjects.end(); ++mesh) {
 			(*mesh)->initOGLData();

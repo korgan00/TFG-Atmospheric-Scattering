@@ -58,7 +58,7 @@ void Engine::SetupOpenGL() {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 32);
 	_ctxt = SDL_GL_CreateContext(_window);
 
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(0);
 
 	if (gl3wInit()) {
 		std::cout << "Error al Inicializar GL3W" << std::endl;
@@ -139,11 +139,25 @@ void Engine::OnEvent(SDL_Event* event) {
 			case SDLK_p:
 				std::cout << " - Current position: " << _camera.position()[0] << ", " << _camera.position()[1] << ", " << _camera.position()[2] << std::endl;
 				break;
+			case SDLK_UP:
+			case SDLK_DOWN:
+				((ScatteringScene)_scene).rotateSunX(0);
+				break;
 			case SDLK_ESCAPE:
 				_running = false;
 				break;
 			default:
 				break;
+			}
+			break;
+		case SDL_KEYDOWN:
+			switch (event->key.keysym.sym) {
+				case SDLK_UP:
+					((ScatteringScene)_scene).rotateSunX(1.0f);
+					break;
+				case SDLK_DOWN:
+					((ScatteringScene)_scene).rotateSunX(-1.0f);
+					break;
 			}
 			break;
 		case SDL_QUIT:
@@ -159,6 +173,7 @@ void Engine::OnLoop() {
 	_old_t = _t;
 
 	_camera.tick(_t, _dt);
+	_scene.tick(_t, _dt);
 
 }
 

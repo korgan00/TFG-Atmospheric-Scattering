@@ -77,9 +77,13 @@ bool intersection(vec3 p1, vec3 p2, inout vec3 t1, inout vec3 t2, vec3 cEarth, f
 	return true;
 }
 
-float shadowDistance(vec3 p) {
+float shadowDistance(vec3 p, float cosPhi) {
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	if( shadowMapCoord.x > 1 || shadowMapCoord.x < 0 || shadowMapCoord.y > 1 || shadowMapCoord.y < 0) {
+		return cosPhi < -0.24f ? 1.0f : 0.0f;
+	}
 	float bias = 0.0003;
+
 	/*
 	mat3 gaussian = mat3(2.25f/25, 3.0f/25, 2.25f/25,
 						 3.0f/25,  4.0f/25, 3.0f/25,
@@ -97,23 +101,42 @@ float shadowDistance(vec3 p) {
 	return ((shadowMapCoord.z - bias) - texture( shadowMap, shadowMapCoord.xy ).z);
 }
 
-float shadowDistanceBlur(vec3 p) {
+float shadowDistanceBlur(vec3 p, float cosPhi) {
 	vec4 shadowMapCoord = depthBiasVP * vec4(p, 1);
+	if( shadowMapCoord.x > 1 || shadowMapCoord.x < 0 || shadowMapCoord.y > 1 || shadowMapCoord.y < 0) {
+		return cosPhi < -0.24f ? 1.0f : 0.0f;
+	}
 	float bias = 0.0003;
 	
 	mat3 gaussian = mat3(2.25f/25, 3.0f/25, 2.25f/25,
 						 3.0f/25,  4.0f/25, 3.0f/25,
 						 2.25f/25, 3.0f/25, 2.25f/25);
-						 
-	float diff = 0.0f;
+	/*/
+	mat3 gaussian = mat3( 0.0f,  1.0f, 0.0f,
+						  1.0f, -4.0f, 1.0f,
+						  0.0f,  1.0f, 0.0f);
+	//*/					 
+	float diff = 0.0f;  
+	float currShadow = 0.0f;
+	vec2 pp = vec2(0.0f, 0.0f);
+	bool someLight = false;
 	for(int i = -1; i < 2; i+=1) {
 		for(int j = -1; j < 2; j+=1) {
-			vec2 pp = vec2(shadowMapCoord.x + bias * i, shadowMapCoord.y + bias * j); 
-			diff += ((shadowMapCoord.z - bias) - texture( shadowMap, pp ).z) * gaussian[i+1][j+1];
+			pp = vec2(shadowMapCoord.x + bias * i, shadowMapCoord.y + bias * j);
+			currShadow = ((shadowMapCoord.z - bias) - texture( shadowMap, pp ).z);// * gaussian[i+1][j+1];
+			someLight = someLight || (currShadow < bias);
+			//diff += (currShadow < 0.0f? 1.0f : 0.0f) * gaussian[i+1][j+1];
+			diff += currShadow * gaussian[i+1][j+1];
 		}
 	}
-	
-	return diff;
+	/*
+	if(someLight) {
+		diff = diff > 0.0f? exp(-diff * 750) : 1.0f;
+	} else {
+		diff = 0.0f;
+	}
+	*/
+	return diff > 0.0f? exp(-diff * 750) : 1.0f;
 }
 
 void main(void)
@@ -174,7 +197,7 @@ void main(void)
 
 		// Calcular visibilidad de P
 		//float visi = cosPhi < -0.24f ? 0.0f : 1.0f;
-		float visi = shadowDistance(point) > 0.0f? 0.0f : 1.0f;
+		float visi = shadowDistance(point, cosPhi) > 0.0f? 0.0f : 1.0f;
 
 		rayLeigh_In += difLR * visi;
 		mie_In += difLM * visi;
@@ -200,26 +223,31 @@ void main(void)
 	vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
 	vec3 normalmap_Color = texelColor;
 	if (distance(obj, C_EARTH) < ATM_RADIUS) {
-		vec3 Kambi = vec3(0.2188f, 0.2188f, 0.2188f);
-		vec3 Kdiff = vec3(0.9888f, 0.9888f, 0.9888f);
-		vec3 Kspec = vec3(0.0f, 0.0f, 0.0f);
-	
+		vec3 Kambi = vec3(0.3f, 0.3f, 0.3f);
+		vec3 Kdiff = vec3(1.0f, 1.0f, 1.0f);
+		vec3 Kspec = vec3(0.05f, 0.05f, 0.05f);
+		float Kshadow = shadowDistanceBlur(obj, dot(normalize(obj - cEarth), -normLightDir));
+		/*if(Kshadow > 0.0f) {
+			Kshadow = exp(-Kshadow * 250);
+			//color *= 0.5;
+		} else { Kshadow = 1.0f; }
+	*/
 		vec3 texelNormal = normalize(texture(texture_normalmap, vertex_tex.st).rgb);
-		vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
 		vec3 normal = cross(cross(vertex_normal, texelNormal), texelNormal);
-		float diffuseFactor = clamp(dot(normLightDir, normal), 0.0f, 1.0f);
+		float diffuseFactor = min(clamp(pow(dot(normLightDir, normal) + 0.1, 3), 0.0f, 1.0f), Kshadow);
 		float specularFactor = pow(clamp(dot(normalize(obj2-computedCam), reflect(-normLightDir, normal)), 0,1 ), 5.0f);
-
+		
+		vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
 		normalmap_Color =  Kambi * texelColor +
 						   Kdiff * texelColor * diffuseFactor +
 						   Kspec * pow(specularFactor, 5.0f);
 
-
+/*
 		float diff = shadowDistanceBlur(obj);
 		if(diff > 0.0f) {
 			normalmap_Color *= exp(-diff * 120);
 			//color *= 0.5;
-		}
+		}*/
 	}
 
 	vec3 L0_Ext = normalmap_Color * extintion;

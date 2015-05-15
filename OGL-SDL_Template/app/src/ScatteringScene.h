@@ -26,6 +26,9 @@ private:
 
 	ScatteringShader* _scatteringShading;
 	ShadowMapShader* _shadowMapShading;
+	vmath::vec2* _sunRotation;
+	vmath::vec2* _sunRotating;
+	bool _updateShadowMap;
 
 	ScatteringShader::ScatteringUniformPseudoConstants_values scattPseudoConstValues();
 	ScatteringShader::ScatteringUniformConstants_values scattConstValues();
@@ -34,6 +37,9 @@ public:
 	void initOGLData();
 
 	void draw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos);
+
+	void tick(GLfloat time, GLfloat elapsedTime);
+	void rotateSunX(GLfloat amount);
 };
 
 #endif /* SCATT_SCENE_H_ */
