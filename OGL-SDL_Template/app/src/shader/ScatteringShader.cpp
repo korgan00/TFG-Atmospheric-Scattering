@@ -144,7 +144,8 @@ void ScatteringShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 camera
 							vmath::vec4(0.5f, 0.5f, 0.5f, 1.f));
 
 
-	glUniformMatrix4fv(_SUids.depthBiasVP, 1, GL_FALSE, biasMatrix * _shadowMapShader->viewProjectionMatrix());
+	glUniformMatrix4fv(_SUids.depthBiasVP, 1, GL_FALSE, 
+		biasMatrix * _shadowMapShader->viewProjectionMatrix());
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, DEFAULT_WIN_WIDTH, DEFAULT_WIN_HEIGHT);
@@ -165,7 +166,7 @@ void ScatteringShader::createHeightScatterMap(ScatteringUniformConstants_values 
 	GLfloat H_M = scattValues.H_M;
 	GLfloat P0 = scattValues.P0;
 
-	GLfloat STEPS = 50.0f;
+	GLfloat STEPS = 100.0f;
 
 	Uint32 *pixR = (Uint32 *)texR->pixels;
 	Uint32 *pixM = (Uint32 *)texM->pixels;

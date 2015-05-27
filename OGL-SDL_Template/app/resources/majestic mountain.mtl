@@ -1,0 +1,12 @@
+# Exported from Bryce5
+
+newmtl material_1
+Ns 80
+d 1.000000
+illum 2
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+map_Ka majestic mountain_mtl1_ambicol.bmp
+map_Kd majestic mountain_mtl1_diffcol.bmp
+map_Bump majestic mountain_mtl1_bumpamt.bmp

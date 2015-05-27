@@ -10,39 +10,76 @@
 
 
 
+void optimizeOBJ();
+
 int main(int argc, char* argv[]) {
-	//std::cin.get();
-	
 	
 	Engine* d = new Engine();
-	d->Execute();
+	d->Execute(); 
+	/*/
 
-	//vector<Mesh> vec = ObjLoader::load("Arid.obj");
-	//DoTheImportThing("../OGL-SDL_Template/app/resources/Cubo.obj");
-	/*
-	Log::error("test");
-	Log::warning("test");
-	Log::info("test");
-	Log::debug("test");
-	Log::trace("test");
-	cout << "test" << endl;
-	*/
-
-	/*
-	cout << endl << endl;
-
-	//ObjLoader loader;
-	clock_t start2 = clock(), diff2;
-	ObjLoader::ObjFileInfo* obj = ObjLoader::load("Arid.obj");
-	Mesh* m = ObjToMesh::convert(obj);
-	diff2 = clock() - start2;
-
-	int msec = diff2 * 1000 / CLOCKS_PER_SEC;
-	stringstream ss;
-	ss << "Time taken " << (msec / 1000) << " seconds " << (msec % 1000) << " milliseconds";
-	Log::info(ss.str());
-	*/
+	optimizeOBJ();
+	cout << "YA";//*/
 	std::cin.get();
 	
+
 	return 0;
 }
+
+
+void optimizeOBJ() {
+	ifstream input("../OGL-SDL_Template/app/resources/Arid.obj");
+
+	char buffer[256];
+	vector<string> vs;
+	string mtlLib = "";
+	typedef vector<string> strVec;
+	strVec others[10];
+	int lastMtl = 0;
+
+
+	while (!input.eof()) {
+		input.getline(buffer, 256);
+		if (buffer[0] == 'v') {
+			vs.push_back(string(buffer));
+		} else if (buffer[0] == 'm') {
+			mtlLib = string(buffer);
+		} else if (buffer[0] == '#') {
+		} else if (buffer[0] == 'g') {
+		} else if (buffer[0] == 'u') {
+			lastMtl = buffer[18] - (int)'A';
+			if (others[lastMtl].size() == 0) {
+				others[lastMtl].push_back(string(buffer));
+			}
+		} else if (buffer[0] == 'f') {
+			others[lastMtl].push_back(string(buffer));
+		}
+	}
+	
+	ofstream output("../OGL-SDL_Template/app/resources/AridOpti.obj");
+
+	output << endl;
+	output << endl;
+	output << mtlLib << endl;
+	output << endl;
+	output << endl;
+
+	for (vector<string>::iterator str = vs.begin(); str != vs.end(); ++str) {
+		output << *str << endl;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		output << endl;
+		output << endl;
+		output << "g" << endl;
+		for (vector<string>::iterator str = others[i].begin(); str != others[i].end(); ++str) {
+			output << *str << endl;
+		}
+	}
+	
+	input.close();
+	output.close();
+	
+}
+
+

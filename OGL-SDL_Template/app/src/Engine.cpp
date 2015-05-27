@@ -141,7 +141,14 @@ void Engine::OnEvent(SDL_Event* event) {
 				break;
 			case SDLK_UP:
 			case SDLK_DOWN:
-				((ScatteringScene)_scene).rotateSunX(0);
+				((ScatteringScene)_scene).rotateSunX(0.0f);
+				break;
+			case SDLK_m:
+				if (((ScatteringScene)_scene).sunIsRotating()) {
+					((ScatteringScene)_scene).rotateSunX(0.0f);
+				} else {
+					((ScatteringScene)_scene).rotateSunX(-0.3f);
+				}
 				break;
 			case SDLK_ESCAPE:
 				_running = false;

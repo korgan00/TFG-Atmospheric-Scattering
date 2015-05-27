@@ -54,7 +54,12 @@ void ScatteringScene::initOGLData() {
 
 	_activeShader = _shadowMapShading;
 
-	_mountains = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
+	//_mountains = ObjToMesh::convert(ObjLoader::load("mtn pass.obj"));
+	//_mountains = ObjToMesh::convert(ObjLoader::load("The City.obj"));
+	//_mountains = ObjToMesh::convert(ObjLoader::load("Mountain Valley.obj"));
+	//_mountains = ObjToMesh::convert(ObjLoader::load("majestic mountain.obj"));
+	_mountains = ObjToMesh::convert(ObjLoader::load("AridOpti.obj"), new MountainTextureFactory());
+	//_mountains = ObjToMesh::convert(ObjLoader::load("Arid.obj"), new MountainTextureFactory());
 	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere2.obj")); /*/ // Massive poligon
 	_blueSphere = ObjToMesh::convert(ObjLoader::load("sphere.obj")); // light*/
 	_deepSpace  = ObjToMesh::convert(ObjLoader::load("deepSpace.obj"));
@@ -136,4 +141,8 @@ void ScatteringScene::tick(GLfloat time, GLfloat elapsedTime) {
 
 void ScatteringScene::rotateSunX(GLfloat amount) {
 	(*_sunRotating)[0] = amount;
+}
+
+bool ScatteringScene::sunIsRotating() {
+	return (*_sunRotating)[0] != 0.0f;
 }

@@ -40,6 +40,7 @@ public:
 
 	void tick(GLfloat time, GLfloat elapsedTime);
 	void rotateSunX(GLfloat amount);
+	bool sunIsRotating();
 };
 
 #endif /* SCATT_SCENE_H_ */

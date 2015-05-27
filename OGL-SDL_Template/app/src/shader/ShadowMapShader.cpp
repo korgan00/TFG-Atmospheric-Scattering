@@ -37,7 +37,8 @@ void ShadowMapShader::applyMaterial(Material* m, GLuint _tsoDiffuse, GLuint _tso
 void ShadowMapShader::preDraw(vmath::mat4 projection_matrix, vmath::vec4 cameraPos) {
 	vmath::vec3 camPosSimple(cameraPos[0], cameraPos[1], cameraPos[2]);
 	_viewProjMatrix = sunViewMatrix(vmath::normalize(_lightDir),
-		vmath::vec3(0.0f, 1.0f, 0.001f), /*camPosSimple*/vmath::vec3(0.0f, 1000.0f, -4000.0f), 2000.0f);
+		vmath::vec3(0.0f, 1.0f, 0.001f), 
+		/*camPosSimple*/vmath::vec3(0.0f, 0.0f, 0.0f), 10000.0f);
 
 	Shader::preDraw(_viewProjMatrix, cameraPos);
 

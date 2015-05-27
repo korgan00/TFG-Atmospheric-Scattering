@@ -1,0 +1,13 @@
+# Exported from Bryce5
+
+newmtl material_1
+Ns 80
+d 1.000000
+illum 2
+Ka 0.247059 0.247059 0.247059
+Kd 0.701961 0.701961 0.701961
+Ks 0.262745 0.262745 0.262745
+map_Ka Mountain Valley_mtl1_ambicol.bmp
+map_Kd Mountain Valley_mtl1_diffcol.bmp
+map_Ks Mountain Valley_mtl1_speccol.bmp
+map_Bump Mountain Valley_mtl1_bumpamt.bmp
