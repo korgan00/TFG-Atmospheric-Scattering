@@ -11,7 +11,7 @@ const GLfloat ScatteringScene::PARTICLE_SCALE_HEIGHT_MIE = 1200.0f;
 
 void ScatteringScene::initOGLData() {
 
-	_sunRotation = new vmath::vec2(0.0f, 0.0f);
+	_sunRotation = new vmath::vec2(-88.0f, 0.0f);
 	_sunRotating = new vmath::vec2(0.0f, 0.0f);
 	_updateShadowMap = true;
 
@@ -89,12 +89,22 @@ ScatteringShader::ScatteringUniformConstants_values ScatteringScene::scattConstV
 
 	scValues.H_R = 7994.0f;
 	scValues.H_M = 1200.0f;
+
+	scValues.WORLD_RADIUS = 6360000.0f;
+	scValues.C_EARTH = vmath::vec3(0.0f, -scValues.WORLD_RADIUS, 0.0f);
+	scValues.ATM_TOP_HEIGHT = 80000.0f;
+
+	scValues.G = 0.85f;
+	scValues.P0 = 1.0f;
+	/*
+	scValues.H_R = 7994.0f;
+	scValues.H_M = 1200.0f;
 	scValues.WORLD_RADIUS = 6360000.0f;
 	scValues.C_EARTH = vmath::vec3(0.0f, -scValues.WORLD_RADIUS, 0.0f);
 	scValues.ATM_TOP_HEIGHT = 80000.0f;
 	scValues.G = 0.76f;
 	scValues.P0 = 1.0f;
-
+	*/
 	return scValues;
 }
 
@@ -110,6 +120,19 @@ ScatteringShader::ScatteringUniformPseudoConstants_values ScatteringScene::scatt
 	spcValues.betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f;
 	spcValues.betaER = spcValues.betaSR;
 	spcValues.betaEM = spcValues.betaSM * 1.1f;
+
+	/*
+
+	vmath::vec4 sunRot = (vmath::rotate((*_sunRotation)[0], vmath::vec3(1.0f, 0.0f, 0.0f)) * vmath::translate(0.0f, -1.0f, 0.0f))[3];
+
+	spcValues.lightDir = vmath::vec3(sunRot[0], sunRot[1], sunRot[2]);
+	spcValues.lightSun = 50.0f;
+
+	spcValues.betaSR = vmath::vec3(5.8f, 13.5f, 33.1f) * 1e-6f;
+	spcValues.betaSM = vmath::vec3(2.0f, 2.0f, 2.0f) * 1e-5f;
+	spcValues.betaER = spcValues.betaSR;
+	spcValues.betaEM = spcValues.betaSM * 1.1f;
+	*/
 
 	return spcValues;
 }

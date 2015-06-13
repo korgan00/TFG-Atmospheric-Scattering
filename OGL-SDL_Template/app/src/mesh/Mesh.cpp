@@ -11,10 +11,13 @@ void Mesh::initOGLData() {
 	glGenBuffers(_eboDataCount, _ebo);
 	glGenTextures(_eboDataCount*2, _tso);
 
+	GLuint triangles = 0;
 	for (GLuint i = 0; i < _eboDataCount; i++) {
 		PerDraw *_eboData = &_elementBufferObjectData[i];
 		_eboData->indicesSize = _eboData->indicesCount * sizeof(GLuint);
 		
+		triangles += _eboData->indicesCount / 3;
+
 		// Le hacemos hueco diciendole el tipo de buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo[i]);
 		// Lo rellenamos con los indices de los cubos
@@ -54,6 +57,8 @@ void Mesh::initOGLData() {
 
 		CheckErr();
 	}
+
+	cout << "Triangulos: " << triangles << " EBOs:" << _eboDataCount;
 
 	// Pedimos un array de vertices
 	glGenVertexArrays(1, _vao);

@@ -1,8 +1,8 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
-#define DEFAULT_WIN_HEIGHT 900
-#define DEFAULT_WIN_WIDTH 1200
+#define DEFAULT_WIN_HEIGHT 600
+#define DEFAULT_WIN_WIDTH 800
 
 #include <string>
 #include <GL/gl3w.h>

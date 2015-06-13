@@ -16,6 +16,8 @@ CameraFPS::CameraFPS(SDL_Window* w) :
 	SDL_GetWindowSize(_window, &winWidth, &winHeight);
 	GLfloat aspect = float(DEFAULT_WIN_HEIGHT) / float(DEFAULT_WIN_WIDTH);
 	_currentMatrix = vmath::mat4(vmath::frustum(-1.0f, 1.0f, -aspect, aspect, 1.0f, RENDER_DISTANCE));
+	//_currentTranslation *= vmath::translate(220.0f, -546.0f, -4453.4f);
+	_currentTranslation *= vmath::translate(-55000.0f, -950000.0f, -4313000.0f);
 }
 
 void CameraFPS::Event(SDL_Event* event) {

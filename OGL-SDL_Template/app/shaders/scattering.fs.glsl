@@ -208,6 +208,7 @@ void main(void)
 	//color = vertex_tex;
 	vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
 	vec3 normalmap_Color = texelColor;
+	
 	if (distance(obj, C_EARTH) < ATM_RADIUS) {
 		vec3 Kambi = vec3(0.3f, 0.3f, 0.3f);
 		vec3 Kdiff = vec3(0.8f, 0.8f, 0.8f);
@@ -217,6 +218,7 @@ void main(void)
 		vec3 normal = normalize(texture(texture_normalmap, vertex_tex.st).gbr * 2.0f - 1.0f);
 		//vec3 normal = vertex_normal;
 		float diffuseFactor = min(clamp(dot(-normLightDir, normal), 0.0f, 1.0f), Kshadow);
+		//float diffuseFactor = min(clamp(dot(-normLightDir, normal), 0.0f, 1.0f), 1.0f);
 		float specularFactor = pow(clamp(dot(normalize(obj2-computedCam), reflect(-normLightDir, normal)), 0,1 ), 5.0f);
 		
 		vec3 texelColor = texture(texture_diffuse, vertex_tex.st).rgb;
